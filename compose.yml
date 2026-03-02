@@ -1,0 +1,26 @@
+services:
+  bcc-canteen:
+    image: syafa/hustleup:latest
+    container_name: hustleup
+    restart: always
+    environment:
+      LIMITER_MAX: ${LIMITER_MAX}
+      LIMITER_EXPIRATION_MINUTES: ${LIMITER_EXPIRATION_MINUTES}
+      BODY_LIMIT_MB: ${BODY_LIMIT_MB}
+      APP_PORT: ${APP_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      REDIS_ADDRESS: ${REDIS_ADDRESS}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_USERNAME: ${REDIS_USERNAME}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_DATABASE: ${REDIS_DATABASE}
+      REDIS_EXPIRATION: ${REDIS_EXPIRATION}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXPIRED_DAYS: ${JWT_EXPIRED_DAYS}
+      MIDTRANS_SERVER_KEY: ${MIDTRANS_SERVER_KEY}
+    ports:
+      - "8080:${APP_PORT}"
