@@ -83,6 +83,8 @@ func (u *UserUseCase) Register(register dto.Register) (dto.ResponseRegister, err
 }
 
 func (u *UserUseCase) UpdateUserInfo(updateUserInfo dto.UpdateUserInfo, userID uuid.UUID) (dto.ResponseUpdateUserInfo, error) {
+	var redisKey string
+
 	user := entity.User{
 		ID:       userID,
 		Email:    updateUserInfo.Email,
@@ -104,6 +106,22 @@ func (u *UserUseCase) UpdateUserInfo(updateUserInfo dto.UpdateUserInfo, userID u
 	if err != nil {
 		log.Println(err)
 	}
+
+	err = u.userRepo.GetUserInfo(&user)
+	if err != nil {
+		return dto.ResponseUpdateUserInfo{},
+			err
+	}
+
+	redisKey = fmt.Sprintf("user:%s", userID.String())
+
+	go func() {
+		newData, err := json.Marshal(user)
+		if err != nil {
+			log.Println(err)
+		}
+		u.redis.Set(redisKey, string(newData))
+	}()
 
 	return user.ParseToDTOResponseUpdateUserInfo(), nil
 }
@@ -179,9 +197,9 @@ func (u *UserUseCase) GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, er
 		ID: userID,
 	}
 
-	key := fmt.Sprintf("user:%s", userID.String())
+	redisKey := fmt.Sprintf("user:%s", userID.String())
 
-	result, err := u.redis.Get(key)
+	result, err := u.redis.Get(redisKey)
 	if err == nil && result != "" {
 		var out entity.User
 
@@ -204,7 +222,7 @@ func (u *UserUseCase) GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, er
 		if err != nil {
 			log.Println(err)
 		}
-		u.redis.Set(key, string(newData))
+		u.redis.Set(redisKey, string(newData))
 	}()
 
 	return user.ParseToDTOResponseGetUserInfo(), nil
