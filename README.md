@@ -48,7 +48,7 @@ Documentation can be found [here](https://hub.docker.com/_/redis)
 docker compose up -d
 ```
 
-> Check logs with `docker logs atr-backend`
+> Check logs with `docker logs -f worku`
 
 ### Manual Build
 
