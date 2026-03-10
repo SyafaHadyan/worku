@@ -5,6 +5,9 @@ import (
 	"log"
 	"time"
 
+	coursehandler "github.com/SyafaHadyan/worku/internal/app/course/interface/rest"
+	courserepository "github.com/SyafaHadyan/worku/internal/app/course/repository"
+	courseusecase "github.com/SyafaHadyan/worku/internal/app/course/usecase"
 	userhandler "github.com/SyafaHadyan/worku/internal/app/user/interface/rest"
 	userrepository "github.com/SyafaHadyan/worku/internal/app/user/repository"
 	userusecase "github.com/SyafaHadyan/worku/internal/app/user/usecase"
@@ -49,10 +52,13 @@ func Start() *Bootstrap {
 	middleware := middleware.NewMiddleware(*jwt)
 
 	userRepository := userrepository.NewUserDB(database)
+	courseRepository := courserepository.NewCourseDB(database)
 
 	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis)
+	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
 
 	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, config)
+	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
 
 	log.Printf("startup time: %v", time.Since(startTime))
 

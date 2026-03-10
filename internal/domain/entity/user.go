@@ -19,10 +19,23 @@ type User struct {
 	UpdatedAt  time.Time      `json:"updated_at" gorm:"type:timestamp;autoUpdateTime"`
 	DeletedAt  gorm.DeletedAt `gorm:"index"`
 	UserDetail UserDetail
+	UserSkill  UserSkill
 }
 
 type UserDetail struct {
-	UserID uuid.UUID `json:"user_id" gorm:"type:char(36);primaryKey"`
+	UserID        uuid.UUID `json:"user_id" gorm:"type:char(36);primaryKey"`
+	LastEducation string    `json:"last_education" gorm:"type:varchar(8)"`
+	Location      string    `json:"location" gorm:"type:varchar(128)"`
+}
+
+type UserSkill struct {
+	UserID  uuid.UUID `json:"user_id" gorm:"type:char(36);primaryKey"`
+	SkillID string    `json:"string" gorm:"type:nvarchar(1024);primaryKey"`
+}
+
+type UserCourse struct {
+	UserID   uuid.UUID `json:"user_id" gorm:"type:char(36);primaryKey"`
+	CourseID string    `json:"string" gorm:"type:char(36);primaryKey"`
 }
 
 func (u *User) ParseToDTOResponseRegister() dto.ResponseRegister {
@@ -50,6 +63,8 @@ func (u *User) ParseToDTOResponseLogin() dto.ResponseLogin {
 
 	return responseLogin
 }
+
+// TODO: fill
 
 func (u *User) ParseToDTOResponseGetUserInfo() dto.ResponseGetUserInfo {
 	var responseGetUserInfo dto.ResponseGetUserInfo

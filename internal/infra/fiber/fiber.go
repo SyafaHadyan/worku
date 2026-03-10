@@ -21,7 +21,7 @@ type Fiber struct {
 func New(env *env.Env) *Fiber {
 	app := fiber.New(
 		fiber.Config{
-			Prefork:   false,
+			Prefork:   true,
 			BodyLimit: env.BodyLimit * 1024 * 1024,
 		},
 	)

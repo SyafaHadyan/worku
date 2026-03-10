@@ -11,7 +11,6 @@ import (
 type CreatePayment struct {
 	ID          uuid.UUID      `json:"id"`
 	OrderID     uuid.UUID      `json:"order_id" validate:"required,uuid_rfc4122"`
-	UserID      uuid.UUID      `json:"user_id"`
 	Price       uint32         `json:"price"`
 	RedirectURL string         `json:"redirect_url"`
 	CreatedAt   time.Time      `json:"created_at" gorm:"type:timestamp;autoCreateTime"`

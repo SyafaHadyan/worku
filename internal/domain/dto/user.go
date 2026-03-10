@@ -47,6 +47,11 @@ type UpdateUserInfo struct {
 	Name     string `json:"name" validate:"omitempty,min=3,max=64"`
 }
 
+type UpdateUserDetail struct {
+	LastEducation string `json:"last_education" validate:"omitempty,oneof=SMA SMK D1 D2 D3 D4 S1 S2 S3"`
+	Location      string `json:"location"`
+}
+
 type EmailVerification struct {
 	ID    uuid.UUID `json:"id"`
 	Email string    `json:"email" validate:"required,email"`
@@ -125,4 +130,8 @@ type ResponseUpdateUserInfo struct {
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+}
+
+type ResposneGetUserSkill struct {
+	Skill string `json:"string"`
 }
