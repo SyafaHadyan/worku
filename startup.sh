@@ -28,6 +28,9 @@ printf "JWT_EXPIRED_DAYS=%s\n" $JWT_EXPIRED_DAYS >>.env
 
 printf "MIDTRANS_SERVER_KEY=%s\n" $MIDTRANS_SERVER_KEY >>.env
 
+printf "OPENAI_API_KEY=change=%s\n" $OPENAI_API_KEY >>.env
+printf "OPENAI_ALLLOWED_MODEL=change=%s\n" $OPENAI_ALLLOWED_MODEL >>.env
+
 printf "%s\n" "done setting up environment variables"
 printf "%s\n" "starting application"
 
