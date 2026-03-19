@@ -73,9 +73,8 @@ func (r *UserDB) Login(user *entity.User) error {
 }
 
 func (r *UserDB) GoogleOAuth(user *entity.User) error {
-	// TODO: created_at and updated_at are not properly returned somehow, idk
 	return r.db.Debug().
-		FirstOrInit(&user).
+		FirstOrCreate(&user).
 		Error
 }
 
