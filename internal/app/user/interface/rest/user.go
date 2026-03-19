@@ -185,6 +185,12 @@ func (h *UserHandler) GoogleCallback(ctx *fiber.Ctx) error {
 	}
 
 	res, token, err := h.UserUseCase.GoogleOAuth(responseGoogleOAuth)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to log in with google",
+		)
+	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "successfully logged in with google",

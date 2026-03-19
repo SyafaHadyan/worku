@@ -14,6 +14,7 @@ import (
 	redisitf "github.com/SyafaHadyan/worku/internal/infra/redis"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type UserUseCaseItf interface {
@@ -165,7 +166,7 @@ func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (
 	}
 
 	err := u.userRepo.GoogleOAuth(&user)
-	if err != nil {
+	if err != gorm.ErrRecordNotFound {
 		return dto.ResponseLogin{},
 			"",
 			err
