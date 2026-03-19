@@ -6,7 +6,6 @@ import (
 
 	"github.com/SyafaHadyan/worku/internal/infra/env"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/idempotency"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
@@ -27,7 +26,6 @@ func New(env *env.Env) *Fiber {
 	)
 
 	app.Use(
-		cache.New(),
 		idempotency.New(),
 		cors.New(
 			cors.Config{

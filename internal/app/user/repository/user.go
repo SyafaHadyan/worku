@@ -75,23 +75,14 @@ func (r *UserDB) Login(user *entity.User) error {
 func (r *UserDB) GoogleOAuth(user *entity.User) error {
 	// TODO: Fix
 
-	var count int64
+	r.db.Debug().
+		Create(user)
 
-	err := r.db.Debug().
-		Model(&user).
+	return r.db.Debug().
+		Model(user).
 		Where("users.email = ?", user.Email).
-		Count(&count).
-		First(&user).
+		First(user).
 		Error
-
-	if count == 0 {
-		err = r.db.Debug().
-			Create(&user).
-			First(&user).
-			Error
-	}
-
-	return err
 }
 
 func (r *UserDB) CheckUsername(user *entity.User) error {
