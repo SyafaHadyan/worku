@@ -20,6 +20,13 @@ type Login struct {
 	Password string `json:"password" validate:"required,min=4"`
 }
 
+type ResponseGoogleOAuth struct {
+	ID            string `json:"id"`
+	Email         string `json:"email"`
+	VerifiedEmail bool   `json:"verified_email"`
+	Picture       string `json:"picture"`
+}
+
 type RenewToken struct {
 	ID uuid.UUID `json:"id"`
 }

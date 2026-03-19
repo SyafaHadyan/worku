@@ -13,6 +13,7 @@ type UserDBItf interface {
 	UpdateUserDetail(userDetail *entity.UserDetail) error
 	UpdateUserInfo(user *entity.User) error
 	Login(user *entity.User) error
+	GoogleOAuth(user *entity.User) error
 	CheckUsername(user *entity.User) error
 	GetUserIDFromUsername(user *entity.User) error
 	GetUsername(user *entity.User, userParam dto.Login) error
@@ -67,6 +68,19 @@ func (r *UserDB) UpdateUserDetail(userDetail *entity.UserDetail) error {
 
 func (r *UserDB) Login(user *entity.User) error {
 	return r.db.Debug().
+		First(user).
+		Error
+}
+
+func (r *UserDB) GoogleOAuth(user *entity.User) error {
+	// TODO: Fix
+
+	r.db.Debug().
+		Create(user)
+
+	return r.db.Debug().
+		Model(user).
+		Where("users.email = ?", user.Email).
 		First(user).
 		Error
 }

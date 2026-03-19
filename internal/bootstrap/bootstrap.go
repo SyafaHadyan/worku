@@ -19,6 +19,7 @@ import (
 	"github.com/SyafaHadyan/worku/internal/infra/env"
 	fiberapp "github.com/SyafaHadyan/worku/internal/infra/fiber"
 	"github.com/SyafaHadyan/worku/internal/infra/jwt"
+	googleoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/google"
 	"github.com/SyafaHadyan/worku/internal/infra/payment"
 	"github.com/SyafaHadyan/worku/internal/infra/redis"
 	"github.com/SyafaHadyan/worku/internal/middleware"
@@ -54,6 +55,8 @@ func Start() *Bootstrap {
 
 	jwt := jwt.New(config)
 
+	googleoauth2 := googleoauth2.New(config)
+
 	_ = payment.New(config)
 
 	app := fiberapp.New(config)
@@ -68,7 +71,7 @@ func Start() *Bootstrap {
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
 	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai)
 
-	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, config)
+	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, config)
 	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
 	aihandler.NewAIHandler(app.Router, validator, decoder, middleware, aiUseCase)
 

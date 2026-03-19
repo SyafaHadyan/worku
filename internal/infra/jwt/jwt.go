@@ -20,7 +20,8 @@ type JWT struct {
 }
 
 type Claims struct {
-	ID uuid.UUID
+	UserID uuid.UUID
+	Role   string
 	jwt.RegisteredClaims
 }
 
@@ -33,7 +34,7 @@ func New(env *env.Env) *JWT {
 
 func (j *JWT) GenerateToken(userID uuid.UUID) (string, error) {
 	claim := Claims{
-		ID: userID,
+		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(
 				time.Now().Add(time.Hour * 24 * time.Duration(j.expiredTime)),
@@ -65,7 +66,7 @@ func (j *JWT) ValidateToken(tokenString string) (uuid.UUID, error) {
 		return uuid.Nil, err
 	}
 
-	userID := claims.ID
+	userID := claims.UserID
 
 	return userID, nil
 }
