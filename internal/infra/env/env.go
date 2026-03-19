@@ -30,6 +30,9 @@ type Env struct {
 	RedisExpiration                   int    `env:"REDIS_EXPIRATION"`
 	JWTSecretKey                      string `env:"JWT_SECRET_KEY"`
 	JWTExpiredDays                    uint   `env:"JWT_EXPIRED_DAYS"`
+	GoogleClientID                    string `env:"GOOGLE_CLIENT_ID"`
+	GoogleClientSecret                string `env:"GOOGLE_CLIENT_SECRET"`
+	GoogleRedirectURL                 string `env:"GOOGLE_REDIRECT_URL"`
 	MidtransServerKey                 string `env:"MIDTRANS_SERVER_KEY"`
 	OpenAIAPIKey                      string `env:"OPENAI_API_KEY"`
 	OpenAIAllowedModel                string `env:"OPENAI_ALLLOWED_MODEL"`

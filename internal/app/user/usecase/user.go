@@ -20,6 +20,7 @@ type UserUseCaseItf interface {
 	Register(register dto.Register) (dto.ResponseRegister, error)
 	UpdateUserInfo(updateUserInfo dto.UpdateUserInfo, userID uuid.UUID) (dto.ResponseUpdateUserInfo, error)
 	Login(login dto.Login) (dto.ResponseLogin, string, error)
+	GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error)
 	GetUserIDFromUsername(username string) (uuid.UUID, error)
 	GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, error)
 	SoftDelete(userID uuid.UUID) error
@@ -144,6 +145,31 @@ func (u *UserUseCase) Login(login dto.Login) (dto.ResponseLogin, string, error) 
 	}
 
 	_ = u.userRepo.GetUserInfo(&user)
+
+	token, err := u.jwt.GenerateToken(user.ID)
+	if err != nil {
+		return dto.ResponseLogin{},
+			"",
+			err
+	}
+
+	return user.ParseToDTOResponseLogin(), token, nil
+}
+
+func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error) {
+	user := entity.User{
+		ID:       uuid.New(),
+		Email:    responseGoogleOAuth.Email,
+		Username: responseGoogleOAuth.Email,
+		Name:     responseGoogleOAuth.Email,
+	}
+
+	err := u.userRepo.GoogleOAuth(&user)
+	if err != nil {
+		return dto.ResponseLogin{},
+			"",
+			err
+	}
 
 	token, err := u.jwt.GenerateToken(user.ID)
 	if err != nil {
