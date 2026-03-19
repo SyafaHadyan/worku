@@ -26,6 +26,10 @@ printf "REDIS_EXPIRATION=%s\n" $REDIS_EXPIRATION >>.env
 printf "JWT_SECRET_KEY=%s\n" $JWT_SECRET_KEY >>.env
 printf "JWT_EXPIRED_DAYS=%s\n" $JWT_EXPIRED_DAYS >>.env
 
+printf "GOOGLE_CLIENT_ID=%s\n" $GOOGLE_CLIENT_ID >>.env
+printf "GOOGLE_CLIENT_SECRET=%s\n" $GOOGLE_CLIENT_SECRET >>.env
+printf "GOOGLE_REDIRECT_URL=%s\n" $GOOGLE_REDIRECT_URL >>.env
+
 printf "MIDTRANS_SERVER_KEY=%s\n" $MIDTRANS_SERVER_KEY >>.env
 
 printf "OPENAI_API_KEY=change=%s\n" $OPENAI_API_KEY >>.env
