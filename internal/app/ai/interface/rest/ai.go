@@ -34,8 +34,76 @@ func NewAIHandler(
 
 	routerGroup = routerGroup.Group("/ai")
 
+	routerGroup.Post("/interview/new", middleware.Authentication, aiHandler.NewAIInterview)
+	routerGroup.Post("/interview", middleware.Authentication, aiHandler.ContinueAIInterview)
 	routerGroup.Post("/cv/upload", middleware.Authentication, aiHandler.UploadCV)
 	routerGroup.Post("/cv/analyze", middleware.Authentication, aiHandler.AnalyzeCV)
+}
+
+func (h *AIHandler) NewAIInterview(ctx *fiber.Ctx) error {
+	var newAIInterview dto.NewAIInterview
+
+	err := ctx.BodyParser(&newAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to parse request body",
+		)
+	}
+
+	err = h.Validator.Struct(newAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid request body",
+		)
+	}
+
+	res, err := h.AIUseCase.NewAIInterview(newAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "successfully submitted new ai interview session",
+		"payload": res,
+	})
+}
+
+func (h *AIHandler) ContinueAIInterview(ctx *fiber.Ctx) error {
+	var continueAIInterview dto.ContinueAIInterview
+
+	err := ctx.BodyParser(&continueAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to parse request body",
+		)
+	}
+
+	err = h.Validator.Struct(continueAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid request body",
+		)
+	}
+
+	res, err := h.AIUseCase.ContinueAIInterview(continueAIInterview)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "successfully submitted new input to the interview session",
+		"payload": res,
+	})
 }
 
 func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {

@@ -24,6 +24,15 @@ type AnalyzeCV struct {
 	AdditionalRequest        string    `json:"addititional_request"`
 }
 
+type NewAIInterview struct {
+	Input string `json:"input" validate:"required,min=3,max=128"`
+}
+
+type ContinueAIInterview struct {
+	PreviousResponseID string `json:"previous_response_id" validate:"required"`
+	Input              string `json:"input" validate:"required,min=1,max=2048"`
+}
+
 type ResponseAnalyzeCV struct {
 	ID       uuid.UUID `json:"id"`
 	FileID   string    `json:"file_id"`
@@ -32,4 +41,9 @@ type ResponseAnalyzeCV struct {
 
 type ResponseUploadCV struct {
 	FileID string `json:"file_id"`
+}
+
+type ResponseAIInterview struct {
+	PreviousResponseID string `json:"previous_response_id"`
+	Response           string `json:"response"`
 }
