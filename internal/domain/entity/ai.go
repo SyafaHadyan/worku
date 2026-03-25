@@ -16,7 +16,6 @@ type ResponseAnalyzeCV struct {
 func (a *ResponseAnalyzeCV) ParseToDTOResponseAnalyzeCV() dto.ResponseAnalyzeCV {
 	return dto.ResponseAnalyzeCV{
 		ID:       a.ID,
-		UserID:   a.UserID,
 		FileID:   a.FileID,
 		Response: a.Response,
 	}

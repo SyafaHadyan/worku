@@ -26,7 +26,6 @@ type AnalyzeCV struct {
 
 type ResponseAnalyzeCV struct {
 	ID       uuid.UUID `json:"id"`
-	UserID   uuid.UUID `json:"user_id"`
 	FileID   string    `json:"file_id"`
 	Response string    `json:"response"`
 }
