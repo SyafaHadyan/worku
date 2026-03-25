@@ -44,8 +44,6 @@ func New(env *env.Env) *Redis {
 		expiration: env.RedisExpiration,
 	}
 
-	Test(&Redis)
-
 	return &Redis
 }
 

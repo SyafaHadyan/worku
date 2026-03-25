@@ -36,6 +36,7 @@ type Env struct {
 	MidtransServerKey                 string `env:"MIDTRANS_SERVER_KEY"`
 	OpenAIAPIKey                      string `env:"OPENAI_API_KEY"`
 	OpenAIAllowedModel                string `env:"OPENAI_ALLLOWED_MODEL"`
+	OpenAIFileExpirySeconds           int64  `env:"OPENAI_FILE_EXPIRY_SECONDS"`
 }
 
 func New() *Env {
