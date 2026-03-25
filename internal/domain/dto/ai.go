@@ -8,6 +8,7 @@ import (
 type AnalyzeCV struct {
 	ID                       uuid.UUID `json:"id"`
 	UserID                   uuid.UUID `json:"user_id"`
+	FileID                   string    `json:"file_id" validate:"required"`
 	JobTitle                 string    `json:"job_title" validate:"required"`
 	TargetCompany            string    `json:"target_company" validate:"required"`
 	Industry                 string    `json:"industry" validate:"required"`
@@ -20,11 +21,16 @@ type AnalyzeCV struct {
 	PrimaryAnalysisGoals     string    `json:"primary_analysis_goals" validate:"required"`
 	JobApplicationsSent      uint32    `json:"job_applications_sent" validate:"required"`
 	BiggestConcern           string    `json:"biggest_concern" validate:"required"`
-	AdditionalRequest        string    `json:"AdditionalRequest"`
+	AdditionalRequest        string    `json:"addititional_request"`
 }
 
 type ResponseAnalyzeCV struct {
 	ID       uuid.UUID `json:"id"`
 	UserID   uuid.UUID `json:"user_id"`
+	FileID   string    `json:"file_id"`
 	Response string    `json:"response"`
+}
+
+type ResponseUploadCV struct {
+	FileID string `json:"file_id"`
 }

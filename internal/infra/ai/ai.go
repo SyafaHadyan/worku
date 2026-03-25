@@ -15,7 +15,8 @@ import (
 )
 
 type AIItf interface {
-	AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV, file *multipart.FileHeader) (string, error)
+	UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error)
+	AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error)
 }
 
 type AI struct {
@@ -52,7 +53,7 @@ func Test(a *AI) {
 	log.Println("openai connection success")
 }
 
-func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV, file *multipart.FileHeader) (string, error) {
+func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error) {
 	fileReader, err := file.Open()
 	if err != nil {
 		return "", err
@@ -60,11 +61,20 @@ func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV, file *multi
 
 	inputfile := openai.File(fileReader, file.Filename, "application/pdf")
 
+	openAIFileExpirySeconds := a.env.OpenAIFileExpirySeconds
+	if openAIFileExpirySeconds < 3600 {
+		openAIFileExpirySeconds = 3600
+	}
+
 	storedFile, err := a.OpenAI.Files.New(
 		ctx,
 		openai.FileNewParams{
 			File:    inputfile,
 			Purpose: openai.FilePurposeUserData,
+			ExpiresAfter: openai.FileNewParamsExpiresAfter{
+				Anchor:  "created_at",
+				Seconds: openAIFileExpirySeconds,
+			},
 		},
 	)
 	if err != nil {
@@ -72,8 +82,13 @@ func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV, file *multi
 		return "", err
 	}
 
+	return storedFile.ID, nil
+}
+
+func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error) {
 	params := responses.ResponseNewParams{
-		Model: a.env.OpenAIAllowedModel,
+		Model:        a.env.OpenAIAllowedModel,
+		Instructions: openai.String("Analyze the provided CV strictly. Your response must only contain the analysis result. Do not offer to create, rewrite, modify, or improve the CV. Do not suggest next steps. Do not ask clarifying questions. Do not add any closing remarks or offers for further assistance."),
 	}
 
 	params.Input = responses.ResponseNewParamsInputUnion{
@@ -82,19 +97,19 @@ func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV, file *multi
 				responses.ResponseInputMessageContentListParam{
 					responses.ResponseInputContentUnionParam{
 						OfInputFile: &responses.ResponseInputFileParam{
-							FileID: openai.String(storedFile.ID),
+							FileID: openai.String(analyzeCV.FileID),
 							Type:   "input_file",
 						},
 					},
 					responses.ResponseInputContentUnionParam{
 						OfInputText: &responses.ResponseInputTextParam{
-							Text: "analyze my cv",
+							Text: "Analyze my CV.",
 							Type: "input_text",
 						},
 					},
 					responses.ResponseInputContentUnionParam{
 						OfInputText: &responses.ResponseInputTextParam{
-							Text: fmt.Sprintf("%#v", analyzeCV),
+							Text: fmt.Sprintf("%+v", analyzeCV),
 							Type: "input_text",
 						},
 					},

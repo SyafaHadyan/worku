@@ -13,7 +13,8 @@ import (
 )
 
 type AIUseCaseItf interface {
-	AnalyzeCV(analyzeCV dto.AnalyzeCV, file multipart.FileHeader) (dto.ResponseAnalyzeCV, error)
+	UploadCV(file multipart.FileHeader) (dto.ResponseUploadCV, error)
+	AnalyzeCV(analyzeCV dto.AnalyzeCV) (dto.ResponseAnalyzeCV, error)
 }
 
 type AIUseCase struct {
@@ -32,15 +33,31 @@ func NewAIUseCase(
 	}
 }
 
-func (u *AIUseCase) AnalyzeCV(analyzeCV dto.AnalyzeCV, file multipart.FileHeader) (dto.ResponseAnalyzeCV, error) {
-	response, err := u.ai.AnalyzeCV(u.aiContext, analyzeCV, &file)
+func (u *AIUseCase) UploadCV(file multipart.FileHeader) (dto.ResponseUploadCV, error) {
+	fileID, err := u.ai.UploadCV(u.aiContext, &file)
+	if err != nil {
+		return dto.ResponseUploadCV{}, err
+	}
+
+	responseUploadCV := dto.ResponseUploadCV{
+		FileID: fileID,
+	}
+
+	return responseUploadCV, err
+}
+
+func (u *AIUseCase) AnalyzeCV(analyzeCV dto.AnalyzeCV) (dto.ResponseAnalyzeCV, error) {
+	analyzeCV.ID = uuid.New()
+
+	response, err := u.ai.AnalyzeCV(u.aiContext, analyzeCV)
 	if err != nil {
 		return dto.ResponseAnalyzeCV{}, err
 	}
 
 	responseAnalyzeCV := entity.ResponseAnalyzeCV{
-		ID:       uuid.New(),
+		ID:       analyzeCV.ID,
 		UserID:   analyzeCV.UserID,
+		FileID:   analyzeCV.FileID,
 		Response: response,
 	}
 

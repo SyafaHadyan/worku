@@ -34,7 +34,31 @@ func NewAIHandler(
 
 	routerGroup = routerGroup.Group("/ai")
 
-	routerGroup.Post("/cv", middleware.Authentication, aiHandler.AnalyzeCV)
+	routerGroup.Post("/cv/upload", middleware.Authentication, aiHandler.UploadCV)
+	routerGroup.Post("/cv/analyze", middleware.Authentication, aiHandler.AnalyzeCV)
+}
+
+func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {
+	file, err := ctx.FormFile("document")
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to upload cv",
+		)
+	}
+
+	res, err := h.AIUseCase.UploadCV(*file)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"message": "successfully uploaded cv",
+		"payload": res,
+	})
 }
 
 func (h *AIHandler) AnalyzeCV(ctx *fiber.Ctx) error {
@@ -48,40 +72,25 @@ func (h *AIHandler) AnalyzeCV(ctx *fiber.Ctx) error {
 		)
 	}
 
-	// TODO: parse multipart form
-
-	// multipartForm, err := ctx.MultipartForm()
-	// if err != nil {
-	// 	return fiber.NewError(
-	// 		http.StatusBadRequest,
-	// 		"failed to parse multipart form",
-	// 	)
-	// }
-
-	// err = h.Decoder.Decode(&analyzeCV, multipartForm.Value)
-	// if err != nil {
-	// 	return fiber.NewError(
-	// 		http.StatusBadRequest,
-	// 		"failed to decode form fields",
-	// 	)
-	// }
+	err = ctx.BodyParser(&analyzeCV)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to parse request body",
+		)
+	}
 
 	analyzeCV.UserID = userID
 
-	// err = h.Validator.Struct(analyzeCV)
-	// if err != nil {
-	// 	return fiber.NewError(
-	// 		http.StatusBadRequest,
-	// 		"invalid request form",
-	// 	)
-	// }
-
-	file, err := ctx.FormFile("document")
+	err = h.Validator.Struct(analyzeCV)
 	if err != nil {
-		return err
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid request body",
+		)
 	}
 
-	res, err := h.AIUseCase.AnalyzeCV(analyzeCV, *file)
+	res, err := h.AIUseCase.AnalyzeCV(analyzeCV)
 	if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
