@@ -36,6 +36,7 @@ func NewAIHandler(
 
 	routerGroup.Post("/interview/new", middleware.Authentication, aiHandler.NewAIInterview)
 	routerGroup.Post("/interview", middleware.Authentication, aiHandler.ContinueAIInterview)
+	routerGroup.Post("/interview/transcribe", middleware.Authentication, aiHandler.Transcribe)
 	routerGroup.Post("/cv/upload", middleware.Authentication, aiHandler.UploadCV)
 	routerGroup.Post("/cv/analyze", middleware.Authentication, aiHandler.AnalyzeCV)
 }
@@ -106,6 +107,34 @@ func (h *AIHandler) ContinueAIInterview(ctx *fiber.Ctx) error {
 	})
 }
 
+func (h *AIHandler) Transcribe(ctx *fiber.Ctx) error {
+	file, err := ctx.FormFile("voice")
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to upload voice",
+		)
+	}
+
+	res, err := h.AIUseCase.Transcribe(file)
+	if err == fiber.ErrBadRequest {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid voice format",
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "successfully transcribed voice",
+		"payload": res,
+	})
+}
+
 func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {
 	file, err := ctx.FormFile("document")
 	if err != nil {
@@ -116,7 +145,12 @@ func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.AIUseCase.UploadCV(*file)
-	if err != nil {
+	if err == fiber.ErrBadRequest {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"file format must be pdf",
+		)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusServiceUnavailable,
 			"unable to connect to 3rd party service",

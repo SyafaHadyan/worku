@@ -30,7 +30,7 @@ type NewAIInterview struct {
 
 type ContinueAIInterview struct {
 	PreviousResponseID string `json:"previous_response_id" validate:"required"`
-	Input              string `json:"input" validate:"required,min=1,max=2048"`
+	Input              string `json:"input" validate:"required,min=1,max=4096"`
 }
 
 type ResponseAnalyzeCV struct {
@@ -46,4 +46,8 @@ type ResponseUploadCV struct {
 type ResponseAIInterview struct {
 	PreviousResponseID string `json:"previous_response_id"`
 	Response           string `json:"response"`
+}
+
+type ResponseTranscribe struct {
+	Response string `json:"response"`
 }

@@ -9,6 +9,8 @@ import (
 
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/infra/env"
+	"github.com/gabriel-vasile/mimetype"
+	"github.com/gofiber/fiber/v2"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/responses"
@@ -17,6 +19,7 @@ import (
 type AIItf interface {
 	NewAIInterview(ctx context.Context, newAIInterview dto.NewAIInterview) (string, string, error)
 	ContinueAIInterview(ctx context.Context, continueAIInterview dto.ContinueAIInterview) (string, string, error)
+	Transcribe(ctx context.Context, file *multipart.FileHeader) (string, error)
 	UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error)
 	AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error)
 }
@@ -46,7 +49,7 @@ func Test(a *AI) {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage("Say \"a\""),
 		},
-		Model: a.env.OpenAIAllowedModel,
+		Model: a.env.OpenAITextModel,
 	})
 	if err != nil {
 		log.Panic("openai connection failed")
@@ -57,7 +60,7 @@ func Test(a *AI) {
 
 func (a *AI) NewAIInterview(ctx context.Context, newAIInterview dto.NewAIInterview) (string, string, error) {
 	params := responses.ResponseNewParams{
-		Model:        a.env.OpenAIAllowedModel,
+		Model:        a.env.OpenAITextModel,
 		Instructions: openai.String("You are a professional interviewer. Ask one question at a time, build on the user's previous answers, maintain a neutral tone, progress from broad to specific questions, and provide constructive feedback only when the interview is complete."),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(newAIInterview.Input),
@@ -71,7 +74,7 @@ func (a *AI) NewAIInterview(ctx context.Context, newAIInterview dto.NewAIIntervi
 
 func (a *AI) ContinueAIInterview(ctx context.Context, continueAIInterview dto.ContinueAIInterview) (string, string, error) {
 	params := responses.ResponseNewParams{
-		Model:              a.env.OpenAIAllowedModel,
+		Model:              a.env.OpenAITextModel,
 		PreviousResponseID: openai.String(continueAIInterview.PreviousResponseID),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(continueAIInterview.Input),
@@ -83,13 +86,44 @@ func (a *AI) ContinueAIInterview(ctx context.Context, continueAIInterview dto.Co
 	return response.ID, response.OutputText(), err
 }
 
+func (a *AI) Transcribe(ctx context.Context, file *multipart.FileHeader) (string, error) {
+	fileReader, err := file.Open()
+	if err != nil {
+		return "", err
+	}
+
+	mimeType, err := mimetype.DetectReader(fileReader)
+	if err != nil || !mimeType.Is("audio/mpeg") {
+		return "", fiber.ErrBadRequest
+	}
+
+	inputFile := openai.File(fileReader, file.Filename, mimeType.String())
+
+	params := openai.AudioTranscriptionNewParams{
+		Model: a.env.OpenAITranscribeModel,
+		File:  inputFile,
+	}
+
+	transcription, err := a.OpenAI.Audio.Transcriptions.New(ctx, params)
+	if err != nil {
+		return "", err
+	}
+
+	return transcription.Text, nil
+}
+
 func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error) {
 	fileReader, err := file.Open()
 	if err != nil {
 		return "", err
 	}
 
-	inputfile := openai.File(fileReader, file.Filename, "application/pdf")
+	mimeType, err := mimetype.DetectReader(fileReader)
+	if err != nil || !mimeType.Is("application/pdf") {
+		return "", fiber.ErrBadRequest
+	}
+
+	inputFile := openai.File(fileReader, file.Filename, mimeType.String())
 
 	openAIFileExpirySeconds := a.env.OpenAIFileExpirySeconds
 	if openAIFileExpirySeconds < 3600 {
@@ -99,7 +133,7 @@ func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, 
 	storedFile, err := a.OpenAI.Files.New(
 		ctx,
 		openai.FileNewParams{
-			File:    inputfile,
+			File:    inputFile,
 			Purpose: openai.FilePurposeUserData,
 			ExpiresAfter: openai.FileNewParamsExpiresAfter{
 				Anchor:  "created_at",
@@ -117,7 +151,7 @@ func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, 
 
 func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error) {
 	params := responses.ResponseNewParams{
-		Model:        a.env.OpenAIAllowedModel,
+		Model:        a.env.OpenAITextModel,
 		Instructions: openai.String("Analyze the provided CV strictly. Your response must only contain the analysis result. Do not offer to create, rewrite, modify, or improve the CV. Do not suggest next steps. Do not ask clarifying questions. Do not add any closing remarks or offers for further assistance."),
 	}
 
