@@ -25,12 +25,15 @@ type AnalyzeCV struct {
 }
 
 type NewAIInterview struct {
-	Input string `json:"input" validate:"required,min=3,max=128"`
+	JobRole       string `json:"job_role" validate:"required"`
+	InterviewType string `json:"interview_type" validate:"required"`
+	Difficulty    string `json:"difficulty" validate:"required"`
+	Input         string `json:"input" validate:"required,min=1,max=8192"`
 }
 
 type ContinueAIInterview struct {
 	PreviousResponseID string `json:"previous_response_id" validate:"required"`
-	Input              string `json:"input" validate:"required,min=1,max=2048"`
+	Input              string `json:"input" validate:"required,min=1,max=8192"`
 }
 
 type ResponseAnalyzeCV struct {
@@ -46,4 +49,8 @@ type ResponseUploadCV struct {
 type ResponseAIInterview struct {
 	PreviousResponseID string `json:"previous_response_id"`
 	Response           string `json:"response"`
+}
+
+type ResponseTranscribe struct {
+	Response string `json:"response"`
 }
