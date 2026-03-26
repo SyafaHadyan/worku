@@ -10,7 +10,7 @@ type ResponseAnalyzeCV struct {
 	ID       uuid.UUID `json:"id" gorm:"type:char(36);primaryKey"`
 	UserID   uuid.UUID `json:"user_id" gorm:"type:char(36)"`
 	FileID   string    `json:"file_id" gorm:"type:varchar(256)"`
-	Response string    `json:"response" gorm:"type:nvarchar(8192)"`
+	Response string    `json:"response" gorm:"type:mediumtext"`
 }
 
 func (a *ResponseAnalyzeCV) ParseToDTOResponseAnalyzeCV() dto.ResponseAnalyzeCV {
