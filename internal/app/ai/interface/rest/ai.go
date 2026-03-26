@@ -161,8 +161,8 @@ func (h *AIHandler) AnalyzeCV(ctx *fiber.Ctx) error {
 	res, err := h.AIUseCase.AnalyzeCV(analyzeCV)
 	if err != nil {
 		return fiber.NewError(
-			http.StatusInternalServerError,
-			"failed to analyze cv",
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
 		)
 	}
 
