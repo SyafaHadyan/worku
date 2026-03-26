@@ -19,7 +19,7 @@ type AnalyzeCV struct {
 	Tools                    string    `json:"tools" validate:"required"`
 	SpokenAndWrittenLanguage string    `json:"spoken_and_written_language" validate:"required"`
 	PrimaryAnalysisGoals     string    `json:"primary_analysis_goals" validate:"required"`
-	JobApplicationsSent      uint32    `json:"job_applications_sent" validate:"required"`
+	JobApplicationsSent      string    `json:"job_applications_sent" validate:"required"`
 	BiggestConcern           string    `json:"biggest_concern" validate:"required"`
 	AdditionalRequest        string    `json:"addititional_request"`
 }
