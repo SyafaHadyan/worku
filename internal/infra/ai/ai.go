@@ -15,6 +15,8 @@ import (
 )
 
 type AIItf interface {
+	NewAIInterview(ctx context.Context, newAIInterview dto.NewAIInterview) (string, string, error)
+	ContinueAIInterview(ctx context.Context, continueAIInterview dto.ContinueAIInterview) (string, string, error)
 	UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error)
 	AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error)
 }
@@ -51,6 +53,34 @@ func Test(a *AI) {
 	}
 
 	log.Println("openai connection success")
+}
+
+func (a *AI) NewAIInterview(ctx context.Context, newAIInterview dto.NewAIInterview) (string, string, error) {
+	params := responses.ResponseNewParams{
+		Model:        a.env.OpenAIAllowedModel,
+		Instructions: openai.String("You are a professional interviewer. Ask one question at a time, build on the user's previous answers, maintain a neutral tone, progress from broad to specific questions, and provide constructive feedback only when the interview is complete."),
+		Input: responses.ResponseNewParamsInputUnion{
+			OfString: openai.String(newAIInterview.Input),
+		},
+	}
+
+	response, err := a.OpenAI.Responses.New(ctx, params)
+
+	return response.ID, response.OutputText(), err
+}
+
+func (a *AI) ContinueAIInterview(ctx context.Context, continueAIInterview dto.ContinueAIInterview) (string, string, error) {
+	params := responses.ResponseNewParams{
+		Model:              a.env.OpenAIAllowedModel,
+		PreviousResponseID: openai.String(continueAIInterview.PreviousResponseID),
+		Input: responses.ResponseNewParamsInputUnion{
+			OfString: openai.String(continueAIInterview.Input),
+		},
+	}
+
+	response, err := a.OpenAI.Responses.New(ctx, params)
+
+	return response.ID, response.OutputText(), err
 }
 
 func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, error) {

@@ -13,6 +13,8 @@ import (
 )
 
 type AIUseCaseItf interface {
+	NewAIInterview(newAIInterview dto.NewAIInterview) (dto.ResponseAIInterview, error)
+	ContinueAIInterview(continueAIInterview dto.ContinueAIInterview) (dto.ResponseAIInterview, error)
 	UploadCV(file multipart.FileHeader) (dto.ResponseUploadCV, error)
 	AnalyzeCV(analyzeCV dto.AnalyzeCV) (dto.ResponseAnalyzeCV, error)
 }
@@ -31,6 +33,24 @@ func NewAIUseCase(
 		ai:        ai,
 		aiContext: context.Background(),
 	}
+}
+
+func (u *AIUseCase) NewAIInterview(newAIInterview dto.NewAIInterview) (dto.ResponseAIInterview, error) {
+	previousResponseID, response, err := u.ai.NewAIInterview(u.aiContext, newAIInterview)
+
+	return dto.ResponseAIInterview{
+		PreviousResponseID: previousResponseID,
+		Response:           response,
+	}, err
+}
+
+func (u *AIUseCase) ContinueAIInterview(continueAIInterview dto.ContinueAIInterview) (dto.ResponseAIInterview, error) {
+	previousResponseID, response, err := u.ai.ContinueAIInterview(u.aiContext, continueAIInterview)
+
+	return dto.ResponseAIInterview{
+		PreviousResponseID: previousResponseID,
+		Response:           response,
+	}, err
 }
 
 func (u *AIUseCase) UploadCV(file multipart.FileHeader) (dto.ResponseUploadCV, error) {

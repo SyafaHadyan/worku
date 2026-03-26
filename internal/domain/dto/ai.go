@@ -19,9 +19,18 @@ type AnalyzeCV struct {
 	Tools                    string    `json:"tools" validate:"required"`
 	SpokenAndWrittenLanguage string    `json:"spoken_and_written_language" validate:"required"`
 	PrimaryAnalysisGoals     string    `json:"primary_analysis_goals" validate:"required"`
-	JobApplicationsSent      uint32    `json:"job_applications_sent" validate:"required"`
+	JobApplicationsSent      string    `json:"job_applications_sent" validate:"required"`
 	BiggestConcern           string    `json:"biggest_concern" validate:"required"`
 	AdditionalRequest        string    `json:"addititional_request"`
+}
+
+type NewAIInterview struct {
+	Input string `json:"input" validate:"required,min=3,max=128"`
+}
+
+type ContinueAIInterview struct {
+	PreviousResponseID string `json:"previous_response_id" validate:"required"`
+	Input              string `json:"input" validate:"required,min=1,max=2048"`
 }
 
 type ResponseAnalyzeCV struct {
@@ -32,4 +41,9 @@ type ResponseAnalyzeCV struct {
 
 type ResponseUploadCV struct {
 	FileID string `json:"file_id"`
+}
+
+type ResponseAIInterview struct {
+	PreviousResponseID string `json:"previous_response_id"`
+	Response           string `json:"response"`
 }
