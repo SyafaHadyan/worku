@@ -144,7 +144,7 @@ func (h *UserHandler) Login(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(
 			http.StatusUnauthorized,
-			"invalid username or password",
+			"invalid email, username or password",
 		)
 	}
 

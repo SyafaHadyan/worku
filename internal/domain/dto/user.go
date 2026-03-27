@@ -10,14 +10,15 @@ import (
 type Register struct {
 	ID       uuid.UUID `json:"id"`
 	Email    string    `json:"email" validate:"required,email"`
-	Username string    `json:"username" validate:"required,min=3,max=32"`
-	Password string    `json:"password" validate:"required,min=4"`
+	Username string    `json:"username" validate:"required,min=2,max=32"`
+	Password string    `json:"password" validate:"required,min=4,max=512"`
 	Name     string    `json:"name" validate:"omitempty,min=3,max=64"`
 }
 
 type Login struct {
-	Username string `json:"username" validate:"required,min=3,max=32"`
-	Password string `json:"password" validate:"required,min=4"`
+	Username string `json:"username" validate:"omitempty,min=2,max=32"`
+	Email    string `json:"email" validate:"omitempty,email"`
+	Password string `json:"password" validate:"required,min=4,max=512"`
 }
 
 type ResponseGoogleOAuth struct {

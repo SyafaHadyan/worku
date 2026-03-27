@@ -2,7 +2,6 @@
 package repository
 
 import (
-	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -16,7 +15,6 @@ type UserDBItf interface {
 	GoogleOAuth(user *entity.User) error
 	CheckUsername(user *entity.User) error
 	GetUserIDFromUsername(user *entity.User) error
-	GetUsername(user *entity.User, userParam dto.Login) error
 	GetUserInfo(user *entity.User) error
 	SoftDelete(user *entity.User) error
 }
@@ -68,6 +66,8 @@ func (r *UserDB) UpdateUserDetail(userDetail *entity.UserDetail) error {
 
 func (r *UserDB) Login(user *entity.User) error {
 	return r.db.Debug().
+		Model(&entity.User{}).
+		Where("username = ? OR email = ?", user.Username, user.Email).
 		First(user).
 		Error
 }
@@ -89,12 +89,6 @@ func (r *UserDB) CheckUsername(user *entity.User) error {
 	return r.db.Debug().
 		Raw("SELECT `username` FROM `users` WHERE username = ?", user.Username).
 		First(&user).
-		Error
-}
-
-func (r *UserDB) GetUsername(user *entity.User, userParam dto.Login) error {
-	return r.db.Debug().
-		First(user, userParam).
 		Error
 }
 

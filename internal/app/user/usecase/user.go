@@ -129,9 +129,12 @@ func (u *UserUseCase) UpdateUserInfo(updateUserInfo dto.UpdateUserInfo, userID u
 }
 
 func (u *UserUseCase) Login(login dto.Login) (dto.ResponseLogin, string, error) {
-	var user entity.User
+	user := entity.User{
+		Username: login.Username,
+		Email:    login.Email,
+	}
 
-	err := u.userRepo.GetUsername(&user, dto.Login{Username: login.Username})
+	err := u.userRepo.Login(&user)
 	if err != nil {
 		return dto.ResponseLogin{},
 			"",
