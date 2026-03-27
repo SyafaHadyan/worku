@@ -4,6 +4,7 @@ package ai
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
 
@@ -128,6 +129,11 @@ func (a *AI) Transcribe(ctx context.Context, file *multipart.FileHeader) (string
 		return "", fiber.ErrBadRequest
 	}
 
+	_, err = fileReader.Seek(0, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
+
 	inputFile := openai.File(fileReader, file.Filename, mimeType.String())
 
 	params := openai.AudioTranscriptionNewParams{
@@ -154,6 +160,11 @@ func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, 
 		return "", fiber.ErrBadRequest
 	}
 
+	_, err = fileReader.Seek(0, io.SeekStart)
+	if err != nil {
+		return "", err
+	}
+
 	inputFile := openai.File(fileReader, file.Filename, mimeType.String())
 
 	openAIFileExpirySeconds := a.env.OpenAIFileExpirySeconds
@@ -173,7 +184,6 @@ func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, 
 		},
 	)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
@@ -216,7 +226,6 @@ func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, er
 
 	res, err := a.OpenAI.Responses.New(ctx, params)
 	if err != nil {
-		log.Println(err)
 		return "", err
 	}
 
