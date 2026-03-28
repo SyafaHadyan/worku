@@ -3,6 +3,7 @@ package payment
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/infra/env"
@@ -57,6 +58,8 @@ func New(env *env.Env) *Payment {
 
 func (p *Payment) calculateSubscriptionPrice(interval int) int64 {
 	result := p.BasePrice.Month
+
+	log.Println(interval)
 
 	switch interval {
 	case 180:

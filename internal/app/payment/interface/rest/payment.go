@@ -3,6 +3,7 @@ package rest
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/SyafaHadyan/worku/internal/app/payment/usecase"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
@@ -10,6 +11,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type PaymentHandler struct {
@@ -30,6 +32,8 @@ func NewPaymentHandler(
 
 	routerGroup.Post("/orders", middleware.Authentication, paymentHandler.CreateOrder)
 	routerGroup.Post("/payments", middleware.Authentication, paymentHandler.CreatePayment)
+	routerGroup.Get("/orders/:id", middleware.Authentication, paymentHandler.GetOrderInfo)
+	routerGroup.Get("orders/list/:page/:limit", middleware.Authentication, paymentHandler.GetOrderList)
 	routerGroup.Post("/payments/verify", paymentHandler.VerifyPayment)
 }
 
@@ -79,13 +83,23 @@ func (h *PaymentHandler) CreateOrder(ctx *fiber.Ctx) error {
 func (h *PaymentHandler) CreatePayment(ctx *fiber.Ctx) error {
 	var createPayment dto.CreatePayment
 
-	err := ctx.BodyParser(&createPayment)
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	err = ctx.BodyParser(&createPayment)
 	if err != nil {
 		return fiber.NewError(
 			http.StatusBadRequest,
 			"failed to parse request body",
 		)
 	}
+
+	createPayment.UserID = userID
 
 	err = h.Validator.Struct(createPayment)
 	if err != nil {
@@ -105,6 +119,90 @@ func (h *PaymentHandler) CreatePayment(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"message": "payment created",
+		"payload": res,
+	})
+}
+
+func (h *PaymentHandler) GetOrderInfo(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	orderID, err := uuid.Parse(ctx.Params("id"))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid order id",
+		)
+	}
+
+	getOrderInfo := dto.GetOrderInfo{
+		ID:     orderID,
+		UserID: userID,
+	}
+
+	res, err := h.PaymentUseCase.GetOrderInfo(getOrderInfo)
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNotFound,
+			"order not found",
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get order info",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "successfully get order info",
+		"payload": res,
+	})
+}
+
+func (h *PaymentHandler) GetOrderList(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	offset, err := strconv.Atoi(ctx.Params("page", "0"))
+	if err != nil || offset < 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid page",
+		)
+	}
+
+	limit, err := strconv.Atoi(ctx.Params("limit", "8"))
+	if err != nil || limit <= 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid limit",
+		)
+	}
+
+	res, err := h.PaymentUseCase.GetOrderList(offset, limit, userID)
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNotFound,
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get order list",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved order list",
 		"payload": res,
 	})
 }

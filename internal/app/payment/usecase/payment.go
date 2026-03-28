@@ -14,11 +14,14 @@ import (
 	"github.com/SyafaHadyan/worku/internal/infra/payment"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type PaymentUseCaseItf interface {
 	CreateOrder(createOrder dto.CreateOrder) (dto.ResponseCreateOrder, error)
 	CreatePayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error)
+	GetOrderInfo(getOrderInfo dto.GetOrderInfo) (dto.ResponseGetOrderInfo, error)
+	GetOrderList(offset int, limit int, userID uuid.UUID) ([]dto.ResponseGetOrderList, error)
 	VerifyPayment(verifyPayment dto.VerifyPayment) error
 }
 
@@ -55,7 +58,8 @@ func (u *PaymentUseCase) CreateOrder(createOrder dto.CreateOrder) (dto.ResponseC
 func (u *PaymentUseCase) CreatePayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error) {
 	paymentID := uuid.New()
 	order := entity.Order{
-		ID: createPayment.OrderID,
+		ID:     createPayment.OrderID,
+		UserID: createPayment.UserID,
 	}
 
 	err := u.paymentRepo.GetOrderInfo(&order)
@@ -66,6 +70,7 @@ func (u *PaymentUseCase) CreatePayment(createPayment dto.CreatePayment) (dto.Res
 		},
 		Interval: order.DurationDays,
 	}
+
 	res, err := u.payment.CreatePayment(createMidtransOrder)
 
 	payment := entity.Payment{
@@ -78,6 +83,40 @@ func (u *PaymentUseCase) CreatePayment(createPayment dto.CreatePayment) (dto.Res
 	err = u.paymentRepo.CreatePayment(&payment)
 
 	return payment.ParseToDTOResponseCreateMidtransOrder(), err
+}
+
+func (u *PaymentUseCase) GetOrderInfo(getOrderInfo dto.GetOrderInfo) (dto.ResponseGetOrderInfo, error) {
+	order := entity.Order{
+		ID:     getOrderInfo.ID,
+		UserID: getOrderInfo.UserID,
+	}
+
+	err := u.paymentRepo.GetOrderInfo(&order)
+
+	return order.ParseToDTOResponseGetOrderInfo(), err
+}
+
+func (u *PaymentUseCase) GetOrderList(offset int, limit int, userID uuid.UUID) ([]dto.ResponseGetOrderList, error) {
+	var order []entity.Order
+
+	offset = offset * limit
+
+	err := u.paymentRepo.GetOrderList(&offset, &limit, userID, &order)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(order) == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+
+	orderList := make([]dto.ResponseGetOrderList, len(order))
+
+	for i, courseItem := range order {
+		orderList[i] = courseItem.ParseToDTOResponseGetOrderList()
+	}
+
+	return orderList, nil
 }
 
 func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {

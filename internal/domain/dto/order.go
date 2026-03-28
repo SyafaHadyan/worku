@@ -22,27 +22,9 @@ type ResponseCreateOrder struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-type UpdateOrder struct {
-	ID     uuid.UUID `json:"id" validate:"required,uuid_rfc4122"`
-	Status string    `json:"status" validate:"required,oneof=COOKING COMPLETED"`
-}
-
-type ResponseUpdateOrder struct {
-	ID           uuid.UUID `json:"id"`
-	UserID       uuid.UUID `json:"user_id"`
-	DurationDays int       `json:"duration_days"`
-	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
-}
-
 type GetOrderInfo struct {
-	ID           uuid.UUID `json:"id"`
-	UserID       uuid.UUID `json:"user_id"`
-	DurationDays int       `json:"duration_days"`
-	Status       string    `json:"status"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID     uuid.UUID `json:"id"`
+	UserID uuid.UUID `json:"user_id"`
 }
 
 type ResponseGetOrderInfo struct {
