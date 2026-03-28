@@ -11,21 +11,29 @@ import (
 type CreatePayment struct {
 	ID          uuid.UUID      `json:"id"`
 	OrderID     uuid.UUID      `json:"order_id" validate:"required,uuid_rfc4122"`
-	Price       uint32         `json:"price"`
 	RedirectURL string         `json:"redirect_url"`
-	CreatedAt   time.Time      `json:"created_at" gorm:"type:timestamp;autoCreateTime"`
-	UpdatedAt   time.Time      `json:"updated_at" gorm:"type:timestamp;autoUpdateTime"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 	DeletedAt   gorm.DeletedAt `gorm:"index"`
 }
 
 type CreateMidtransOrder struct {
 	TransactionDetails TransactionDetails
 	CustomerDetail     CustomerDetail
+	Interval           int
+}
+
+type CreateMidtransSubscription struct {
+	SubscriptionName string
+	Currency         string
+	Interval         int
+	IntervalUnit     string
+	CustomerDetail   CustomerDetail
 }
 
 type TransactionDetails struct {
 	OrderID     string `json:"order_id" validate:"required,number,min=1"`
-	GrossAmount uint32 `json:"gross_amount" validate:"required,number,min=1"`
+	GrossAmount int64  `json:"gross_amount" validate:"required,number,min=1"`
 }
 
 type CustomerDetail struct {
@@ -34,15 +42,15 @@ type CustomerDetail struct {
 	Email     string `json:"email" validate:"omitempty,email"`
 }
 
-type ResponseMidtransOrder struct {
+type ResponseCreateMidtransOrder struct {
 	Token       string `json:"token"`
 	RedirectURL string `json:"redirect_url"`
 }
 
 type VerifyPayment struct {
 	TransactionStatus string `json:"transaction_status"`
-	TransactionID     string `json:"transaction_id"`
 	SignatureKey      string `json:"signature_key"`
 	StatusCode        string `json:"status_code"`
+	OrderID           string `json:"order_id"`
 	GrossAmount       string `json:"gross_amount"`
 }

@@ -11,6 +11,9 @@ import (
 	coursehandler "github.com/SyafaHadyan/worku/internal/app/course/interface/rest"
 	courserepository "github.com/SyafaHadyan/worku/internal/app/course/repository"
 	courseusecase "github.com/SyafaHadyan/worku/internal/app/course/usecase"
+	paymenthandler "github.com/SyafaHadyan/worku/internal/app/payment/interface/rest"
+	paymentrepository "github.com/SyafaHadyan/worku/internal/app/payment/repository"
+	paymentusecase "github.com/SyafaHadyan/worku/internal/app/payment/usecase"
 	userhandler "github.com/SyafaHadyan/worku/internal/app/user/interface/rest"
 	userrepository "github.com/SyafaHadyan/worku/internal/app/user/repository"
 	userusecase "github.com/SyafaHadyan/worku/internal/app/user/usecase"
@@ -57,7 +60,7 @@ func Start() *Bootstrap {
 
 	googleoauth2 := googleoauth2.New(config)
 
-	_ = payment.New(config)
+	payment := payment.New(config)
 
 	app := fiberapp.New(config)
 
@@ -66,14 +69,17 @@ func Start() *Bootstrap {
 	userRepository := userrepository.NewUserDB(database)
 	courseRepository := courserepository.NewCourseDB(database)
 	aiRepository := airepository.NewAIDB(database)
+	paymentRepository := paymentrepository.NewPaymentDB(database)
 
 	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis)
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
 	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai)
+	paymentUseCase := paymentusecase.NewPaymentuseCase(paymentRepository, payment, config)
 
 	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, config)
 	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
 	aihandler.NewAIHandler(app.Router, validator, decoder, middleware, aiUseCase)
+	paymenthandler.NewPaymentHandler(app.Router, validator, middleware, paymentUseCase)
 
 	log.Printf("startup time: %v", time.Since(startTime))
 
