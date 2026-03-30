@@ -18,7 +18,7 @@ import (
 type CourseUseCaseItf interface {
 	GetCourseList(offset int, limit int) ([]dto.ResponseGetCourseList, error)
 	GetCourseInfo(courseID uuid.UUID) (dto.ResponseGetCourseInfo, error)
-	SearchCourse(query string) ([]dto.ResponseSearchCourse, error)
+	SearchCourse(offset int, limit int, query string) ([]dto.ResponseSearchCourse, error)
 }
 
 type CourseUseCase struct {
@@ -102,10 +102,12 @@ func (u *CourseUseCase) GetCourseInfo(courseID uuid.UUID) (dto.ResponseGetCourse
 	return course.ParseToDTOResponseGetCourseInfo(), nil
 }
 
-func (u *CourseUseCase) SearchCourse(query string) ([]dto.ResponseSearchCourse, error) {
+func (u *CourseUseCase) SearchCourse(offset int, limit int, query string) ([]dto.ResponseSearchCourse, error) {
 	var course []entity.Course
 
-	err := u.courseRepo.SearchCourse(&query, &course)
+	offset = offset * limit
+
+	err := u.courseRepo.SearchCourse(&offset, &limit, &query, &course)
 	if err != nil {
 		return nil, err
 	}
