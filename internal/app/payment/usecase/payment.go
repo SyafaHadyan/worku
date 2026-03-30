@@ -5,7 +5,6 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/SyafaHadyan/worku/internal/app/payment/repository"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
@@ -19,7 +18,7 @@ import (
 
 type PaymentUseCaseItf interface {
 	CreateOrder(createOrder dto.CreateOrder) (dto.ResponseCreateOrder, error)
-	CreatePayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error)
+	CreateSnapPayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error)
 	GetOrderInfo(getOrderInfo dto.GetOrderInfo) (dto.ResponseGetOrderInfo, error)
 	GetOrderList(offset int, limit int, userID uuid.UUID) ([]dto.ResponseGetOrderList, error)
 	VerifyPayment(verifyPayment dto.VerifyPayment) error
@@ -55,7 +54,7 @@ func (u *PaymentUseCase) CreateOrder(createOrder dto.CreateOrder) (dto.ResponseC
 	return order.ParseToDTOResponseCreateOrder(), err
 }
 
-func (u *PaymentUseCase) CreatePayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error) {
+func (u *PaymentUseCase) CreateSnapPayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error) {
 	paymentID := uuid.New()
 	order := entity.Order{
 		ID:     createPayment.OrderID,
@@ -63,20 +62,55 @@ func (u *PaymentUseCase) CreatePayment(createPayment dto.CreatePayment) (dto.Res
 	}
 
 	err := u.paymentRepo.GetOrderInfo(&order)
+	if err != nil || order.Status == "PAID" {
+		return dto.ResponseCreateMidtransOrder{}, gorm.ErrRecordNotFound
+	}
 
-	createMidtransOrder := dto.CreateMidtransOrder{
+	createMidtransSnapOrder := dto.CreateMidtransSnapOrder{
 		TransactionDetails: dto.TransactionDetails{
 			OrderID: paymentID.String(),
 		},
 		Interval: order.DurationDays,
 	}
 
-	res, err := u.payment.CreatePayment(createMidtransOrder)
+	res, err := u.payment.CreateSnapPayment(createMidtransSnapOrder)
 
 	payment := entity.Payment{
 		ID:          paymentID,
 		OrderID:     createPayment.OrderID,
 		Token:       res.Token,
+		RedirectURL: res.RedirectURL,
+	}
+
+	err = u.paymentRepo.CreatePayment(&payment)
+
+	return payment.ParseToDTOResponseCreateMidtransOrder(), err
+}
+
+func (u *PaymentUseCase) CreateCoreAPIPayment(createPayment dto.CreatePayment) (dto.ResponseCreateMidtransOrder, error) {
+	paymentID := uuid.New()
+	order := entity.Order{
+		ID:     createPayment.OrderID,
+		UserID: createPayment.UserID,
+	}
+
+	err := u.paymentRepo.GetOrderInfo(&order)
+	if err != nil || order.Status == "PAID" {
+		return dto.ResponseCreateMidtransOrder{}, gorm.ErrRecordNotFound
+	}
+
+	createMidtransCoreAPIOrder := dto.CreateMidtransCoreAPIOrder{
+		TransactionDetails: dto.TransactionDetails{
+			OrderID: paymentID.String(),
+		},
+		Interval: order.DurationDays,
+	}
+
+	res, err := u.payment.CreateCoreAPIPayment(createMidtransCoreAPIOrder)
+
+	payment := entity.Payment{
+		ID:          paymentID,
+		OrderID:     createPayment.OrderID,
 		RedirectURL: res.RedirectURL,
 	}
 
@@ -146,8 +180,6 @@ func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
 	order := entity.Order{
 		ID: orderID,
 	}
-
-	log.Println(order)
 
 	err := c.paymentRepo.VerifyPayment(&order)
 

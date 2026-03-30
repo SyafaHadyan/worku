@@ -31,7 +31,8 @@ func NewPaymentHandler(
 	}
 
 	routerGroup.Post("/orders", middleware.Authentication, paymentHandler.CreateOrder)
-	routerGroup.Post("/payments", middleware.Authentication, paymentHandler.CreatePayment)
+	routerGroup.Post("/payments/snap", middleware.Authentication, paymentHandler.CreateSnapPayment)
+	routerGroup.Post("/payments/coreapi", middleware.Authentication, paymentHandler.CreateCoreAPIPayment)
 	routerGroup.Get("/orders/:id", middleware.Authentication, paymentHandler.GetOrderInfo)
 	routerGroup.Get("orders/list/:page/:limit", middleware.Authentication, paymentHandler.GetOrderList)
 	routerGroup.Post("/payments/verify", paymentHandler.VerifyPayment)
@@ -80,7 +81,7 @@ func (h *PaymentHandler) CreateOrder(ctx *fiber.Ctx) error {
 	})
 }
 
-func (h *PaymentHandler) CreatePayment(ctx *fiber.Ctx) error {
+func (h *PaymentHandler) CreateSnapPayment(ctx *fiber.Ctx) error {
 	var createPayment dto.CreatePayment
 
 	userID, err := uuid.Parse(ctx.Locals("userID").(string))
@@ -109,8 +110,61 @@ func (h *PaymentHandler) CreatePayment(ctx *fiber.Ctx) error {
 		)
 	}
 
-	res, err := h.PaymentUseCase.CreatePayment(createPayment)
+	res, err := h.PaymentUseCase.CreateSnapPayment(createPayment)
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNotFound,
+			"order not found / already paid",
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"unable to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"message": "payment created",
+		"payload": res,
+	})
+}
+
+func (h *PaymentHandler) CreateCoreAPIPayment(ctx *fiber.Ctx) error {
+	var createPayment dto.CreatePayment
+
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
 	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	err = ctx.BodyParser(&createPayment)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to parse request body",
+		)
+	}
+
+	createPayment.UserID = userID
+
+	err = h.Validator.Struct(createPayment)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid request body",
+		)
+	}
+
+	res, err := h.PaymentUseCase.CreateSnapPayment(createPayment)
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNotFound,
+			"order not found / already paid",
+		)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusServiceUnavailable,
 			"unable to connect to 3rd party service",

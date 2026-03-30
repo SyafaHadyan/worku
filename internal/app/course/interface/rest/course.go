@@ -33,7 +33,7 @@ func NewCourseHandler(
 
 	routerGroup.Get("/list/:page/:limit", middleware.Authentication, courseHandler.GetCourseList)
 	routerGroup.Get("/:id", middleware.Authentication, courseHandler.GetCourseInfo)
-	routerGroup.Get("/search/:query", middleware.Authentication, courseHandler.SearchCourse)
+	routerGroup.Get("/search/:page/:limit/:query", middleware.Authentication, courseHandler.SearchCourse)
 }
 
 func (h *CourseHandler) GetCourseList(ctx *fiber.Ctx) error {
@@ -100,9 +100,24 @@ func (h *CourseHandler) GetCourseInfo(ctx *fiber.Ctx) error {
 }
 
 func (h *CourseHandler) SearchCourse(ctx *fiber.Ctx) error {
+	offset, err := strconv.Atoi(ctx.Params("page", "0"))
+	if err != nil || offset < 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid page",
+		)
+	}
+
+	limit, err := strconv.Atoi(ctx.Params("limit", "8"))
+	if err != nil || limit <= 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid limit",
+		)
+	}
 	query := ctx.Params("query")
 
-	res, err := h.CourseUseCase.SearchCourse(query)
+	res, err := h.CourseUseCase.SearchCourse(offset, limit, query)
 	if err == gorm.ErrRecordNotFound {
 		return fiber.NewError(
 			http.StatusNotFound,
