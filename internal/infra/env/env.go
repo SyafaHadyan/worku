@@ -34,6 +34,9 @@ type Env struct {
 	GoogleClientSecret                string `env:"GOOGLE_CLIENT_SECRET"`
 	GoogleRedirectURL                 string `env:"GOOGLE_REDIRECT_URL"`
 	MidtransServerKey                 string `env:"MIDTRANS_SERVER_KEY"`
+	MidtransClientKey                 string `env:"MIDTRANS_CLIENT_KEY"`
+	MidtransClientID                  string `env:"MIDTRANS_CLIENT_ID"`
+	MidtransClientSecret              string `env:"MIDTRANS_CLIENT_SECRET"`
 	OpenAIAPIKey                      string `env:"OPENAI_API_KEY"`
 	OpenAITextModel                   string `env:"OPENAI_TEXT_MODEL"`
 	OpenAITranscribeModel             string `env:"OPENAI_TRANSCRIBE_MODEL"`
