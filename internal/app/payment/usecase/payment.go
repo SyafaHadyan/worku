@@ -5,7 +5,6 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	"log"
 
 	"github.com/SyafaHadyan/worku/internal/app/payment/repository"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
@@ -181,8 +180,6 @@ func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
 	order := entity.Order{
 		ID: orderID,
 	}
-
-	log.Println(order)
 
 	err := c.paymentRepo.VerifyPayment(&order)
 

@@ -70,8 +70,6 @@ func New(env *env.Env) *Payment {
 func (p *Payment) calculatePrice(interval int) int64 {
 	result := p.basePrice.Month
 
-	log.Println(interval)
-
 	switch interval {
 	case 180:
 		result = (result * int64(100-p.baseMonthDiscountPercentage.Month6) / 100) * 6
