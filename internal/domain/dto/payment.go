@@ -9,22 +9,31 @@ import (
 )
 
 type CreatePayment struct {
-	ID          uuid.UUID      `json:"id"`
-	OrderID     uuid.UUID      `json:"order_id" validate:"required,uuid_rfc4122"`
-	UserID      uuid.UUID      `json:"user_id"`
-	RedirectURL string         `json:"redirect_url"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	DeletedAt   gorm.DeletedAt `gorm:"index"`
+	ID            uuid.UUID      `json:"id"`
+	OrderID       uuid.UUID      `json:"order_id" validate:"required,uuid_rfc4122"`
+	UserID        uuid.UUID      `json:"user_id"`
+	PaymentMethod string         `json:"payemnt_method"`
+	Card          Card           `json:"card"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt `gorm:"index"`
 }
 
-type CreateMidtransOrder struct {
+type CreateMidtransSnapOrder struct {
 	TransactionDetails TransactionDetails
 	CustomerDetail     CustomerDetail
 	Interval           int
 }
 
-type CreateMidtransSubscription struct {
+type CreateMidtransCoreAPIOrder struct {
+	TransactionDetails TransactionDetails
+	CustomerDetail     CustomerDetail
+	Card               Card
+	Interval           int
+	PaymentMethod      string
+}
+
+type CreateMidtransCoreAPISubscription struct {
 	SubscriptionName string
 	Currency         string
 	Interval         int
@@ -41,6 +50,13 @@ type CustomerDetail struct {
 	FirstName string `json:"first_name" validate:"omitempty,min=1"`
 	LastName  string `json:"last_name" validate:"omitempty,min=1"`
 	Email     string `json:"email" validate:"omitempty,email"`
+}
+
+type Card struct {
+	CardNumber  string `json:"card_number" validate:"omitempty,credit_card"`
+	ExpiryMonth int    `json:"expiry_month" validate:"omitempty,number"`
+	ExpiryYear  int    `json:"expiiry_year" validate:"omitempty,number"`
+	CVV         string `json:"cvv" validate:"omitempty,number"`
 }
 
 type ResponseCreateMidtransOrder struct {

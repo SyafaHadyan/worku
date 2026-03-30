@@ -50,8 +50,6 @@ func (r *PaymentDB) GetOrderList(offset *int, limit *int, userID uuid.UUID, orde
 }
 
 func (r *PaymentDB) CreatePayment(payment *entity.Payment) error {
-	// TODO: check if order is already paid
-
 	return r.db.Debug().
 		Create(payment).
 		Error
