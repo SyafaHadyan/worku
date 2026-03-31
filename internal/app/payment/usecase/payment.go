@@ -5,6 +5,8 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"log"
+	"time"
 
 	"github.com/SyafaHadyan/worku/internal/app/payment/repository"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
@@ -153,7 +155,7 @@ func (u *PaymentUseCase) GetOrderList(offset int, limit int, userID uuid.UUID) (
 	return orderList, nil
 }
 
-func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
+func (u *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
 	orderID, _ := uuid.Parse(verifyPayment.OrderID)
 	transactionStatus := verifyPayment.TransactionStatus
 
@@ -162,7 +164,7 @@ func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
 		verifyPayment.OrderID,
 		verifyPayment.StatusCode,
 		verifyPayment.GrossAmount,
-		c.env.MidtransServerKey,
+		u.env.MidtransServerKey,
 	)
 
 	hash := sha512.New()
@@ -177,11 +179,47 @@ func (c *PaymentUseCase) VerifyPayment(verifyPayment dto.VerifyPayment) error {
 	if transactionStatus != "capture" && transactionStatus != "settlement" {
 		return fiber.ErrPaymentRequired
 	}
+
 	order := entity.Order{
 		ID: orderID,
 	}
 
-	err := c.paymentRepo.VerifyPayment(&order)
+	err := u.paymentRepo.VerifyPayment(&order)
+	if err == gorm.ErrRecordNotFound {
+		return err
+	}
+
+	go func() {
+		orderID, err := u.paymentRepo.GetOrderIDFromPayment(&order)
+		if err != nil {
+			log.Println(err)
+		}
+
+		order := entity.Order{
+			ID: orderID,
+		}
+
+		err = u.paymentRepo.GetOrderInfoAfterPayment(&order)
+		if err != nil {
+			log.Println(err)
+		}
+
+		userSubscription := entity.UserSubscription{
+			UserID: order.UserID,
+		}
+		startTime := time.Now()
+
+		err = u.paymentRepo.GetUserSubscriptionExpiryDate(&userSubscription)
+		if err == nil {
+			startTime = userSubscription.ExpiryDate
+		}
+
+		expiryDate := startTime.AddDate(0, 0, order.DurationDays)
+
+		userSubscription.ExpiryDate = expiryDate
+
+		err = u.paymentRepo.UpdateUserPaidStatus(&userSubscription)
+	}()
 
 	return err
 }

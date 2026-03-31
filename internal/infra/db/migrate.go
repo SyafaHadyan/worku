@@ -21,6 +21,7 @@ func Migrate(db *gorm.DB) {
 		entity.UserSoftSkill{},
 		entity.UserTools{},
 		entity.UserLink{},
+		entity.UserSubscription{},
 		entity.Course{},
 		entity.ResponseAnalyzeCV{},
 		entity.Order{},

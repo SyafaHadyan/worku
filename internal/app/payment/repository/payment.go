@@ -10,9 +10,13 @@ import (
 type PaymentDBItf interface {
 	CreateOrder(order *entity.Order) error
 	GetOrderInfo(order *entity.Order) error
+	GetOrderInfoAfterPayment(order *entity.Order) error
+	GetOrderIDFromPayment(order *entity.Order) (uuid.UUID, error)
 	GetOrderList(offset *int, limit *int, userID uuid.UUID, order *[]entity.Order) error
 	CreatePayment(payment *entity.Payment) error
 	VerifyPayment(order *entity.Order) error
+	GetUserSubscriptionExpiryDate(userSubscription *entity.UserSubscription) error
+	UpdateUserPaidStatus(userSubscription *entity.UserSubscription) error
 }
 
 type PaymentDB struct {
@@ -37,6 +41,27 @@ func (r *PaymentDB) GetOrderInfo(order *entity.Order) error {
 		Where("id = ? AND user_id = ?", order.ID, order.UserID).
 		First(order).
 		Error
+}
+
+func (r *PaymentDB) GetOrderInfoAfterPayment(order *entity.Order) error {
+	return r.db.Debug().
+		Model(&entity.Order{}).
+		Where("id = ?", order.ID).
+		First(order).
+		Error
+}
+
+func (r *PaymentDB) GetOrderIDFromPayment(order *entity.Order) (uuid.UUID, error) {
+	var payment entity.Payment
+
+	err := r.db.Debug().
+		Model(&entity.Payment{}).
+		Select("order_id").
+		Where("id = ?", order.ID).
+		First(&payment).
+		Error
+
+	return payment.OrderID, err
 }
 
 func (r *PaymentDB) GetOrderList(offset *int, limit *int, userID uuid.UUID, order *[]entity.Order) error {
@@ -69,4 +94,28 @@ func (r *PaymentDB) VerifyPayment(order *entity.Order) error {
 		Where("id = ?", payment.OrderID).
 		Update("status", "PAID").
 		Error
+}
+
+func (r *PaymentDB) GetUserSubscriptionExpiryDate(userSubscription *entity.UserSubscription) error {
+	return r.db.Debug().
+		Model(&entity.UserSubscription{}).
+		Where("user_id = ?", userSubscription.UserID).
+		First(userSubscription).
+		Error
+}
+
+func (r *PaymentDB) UpdateUserPaidStatus(userSubscription *entity.UserSubscription) error {
+	var err error
+
+	if r.db.Debug().
+		Model(&entity.UserSubscription{}).
+		Where("user_id = ?", userSubscription.UserID).
+		Update("expiry_date", userSubscription.ExpiryDate).
+		RowsAffected == 0 {
+		err = r.db.Debug().
+			Create(userSubscription).
+			Error
+	}
+
+	return err
 }
