@@ -69,6 +69,7 @@ func NewUserHandler(
 	routerGroup.Get("/info/softskill", middleware.Authentication, userHandler.GetUserSoftSkill)
 	routerGroup.Get("/info/tool", middleware.Authentication, userHandler.GetUserTools)
 	routerGroup.Get("/info/link", middleware.Authentication, userHandler.GetUserLink)
+	routerGroup.Get("/info/subscription", middleware.Authentication, userHandler.GetUserSubscription)
 	routerGroup.Delete("/info/language/:language", middleware.Authentication, userHandler.DeleteUserLanguage)
 	routerGroup.Delete("/info/hardskill/:hardskill", middleware.Authentication, userHandler.DeleteUserHardSkill)
 	routerGroup.Delete("/info/softskill/:softskill", middleware.Authentication, userHandler.DeleteUserSoftSkill)
@@ -974,6 +975,29 @@ func (h *UserHandler) GetUserLink(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "retrieved user link",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserSubscription(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserSubscription(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user subscription",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user subscription",
 		"payload": res,
 	})
 }

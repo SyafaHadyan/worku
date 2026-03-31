@@ -35,6 +35,7 @@ type UserDBItf interface {
 	GetUserSoftSkill(userSoftSkill *[]entity.UserSoftSkill) error
 	GetUserTools(userTools *[]entity.UserTools) error
 	GetUserLink(userLink *entity.UserLink) error
+	GetUserSubscription(userSubscription *entity.UserSubscription) error
 	CheckUsername(user *entity.User) error
 	GetUserIDFromUsername(user *entity.User) error
 	DeleteUserLanguage(userLanguage *entity.UserLanguage) error
@@ -319,6 +320,13 @@ func (r *UserDB) GetUserLink(userLink *entity.UserLink) error {
 	return r.db.Debug().
 		Model(&entity.UserLink{}).
 		First(userLink).
+		Error
+}
+
+func (r *UserDB) GetUserSubscription(userSubscription *entity.UserSubscription) error {
+	return r.db.Debug().
+		Model(&entity.UserSubscription{}).
+		First(userSubscription).
 		Error
 }
 

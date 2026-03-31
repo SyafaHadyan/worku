@@ -29,6 +29,7 @@ type User struct {
 	UserSoftSkill      []UserSoftSkill
 	UserTools          []UserTools
 	UserLink           UserLink
+	UserSubscription   UserSubscription
 	CreatedAt          time.Time      `gorm:"type:timestamp;autoCreateTime"`
 	UpdatedAt          time.Time      `gorm:"type:timestamp;autoUpdateTime"`
 	DeletedAt          gorm.DeletedAt `gorm:"index"`
@@ -270,6 +271,17 @@ func (u *UserTools) ParseToDTOResponseGetUserTools() dto.ResponseGetUserTools {
 
 func (u *UserLink) ParseToDTOResponseGetUserLink() dto.ResponseGetUserLink {
 	var response dto.ResponseGetUserLink
+
+	err := copier.Copy(&response, u)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return response
+}
+
+func (u *UserSubscription) ParseToDTOResponseGetUserSubscription() dto.ResponseGetUserSubscription {
+	var response dto.ResponseGetUserSubscription
 
 	err := copier.Copy(&response, u)
 	if err != nil {

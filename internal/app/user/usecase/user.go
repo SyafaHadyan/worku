@@ -34,6 +34,7 @@ type UserUseCaseItf interface {
 	GetUserSoftSkill(userID uuid.UUID) ([]dto.ResponseGetUserSoftSkill, error)
 	GetUserTools(userID uuid.UUID) ([]dto.ResponseGetUserTools, error)
 	GetUserLink(userID uuid.UUID) (dto.ResponseGetUserLink, error)
+	GetUserSubscription(userID uuid.UUID) (dto.ResponseGetUserSubscription, error)
 	UpdateUserInfo(updateUserInfo dto.UpdateUserInfo) (dto.ResponseUpdateUserInfo, error)
 	UpdateUserDetail(updateUserDetail dto.UpdateUserDetail) (dto.ResponseUpdateUserDetail, error)
 	UpdateUserContact(updateUserContact dto.UpdateUserContact) (dto.ResponseUpdateUserContact, error)
@@ -377,6 +378,19 @@ func (u *UserUseCase) GetUserLink(userID uuid.UUID) (dto.ResponseGetUserLink, er
 	return userLink.ParseToDTOResponseGetUserLink(), nil
 }
 
+func (u *UserUseCase) GetUserSubscription(userID uuid.UUID) (dto.ResponseGetUserSubscription, error) {
+	userSubscription := entity.UserSubscription{
+		UserID: userID,
+	}
+
+	err := u.userRepo.GetUserSubscription(&userSubscription)
+	if err != nil {
+		return dto.ResponseGetUserSubscription{}, err
+	}
+
+	return userSubscription.ParseToDTOResponseGetUserSubscription(), nil
+}
+
 func (u *UserUseCase) UpdateUserInfo(updateUserInfo dto.UpdateUserInfo) (dto.ResponseUpdateUserInfo, error) {
 	var redisKey string
 
@@ -426,8 +440,6 @@ func (u *UserUseCase) UpdateUserDetail(updateUserDetail dto.UpdateUserDetail) (d
 		Location:    updateUserDetail.Location,
 	}
 
-	log.Println(userDetail)
-
 	err := u.userRepo.UpdateUserDetail(&userDetail)
 	if err != nil {
 		return dto.ResponseUpdateUserDetail{},
@@ -459,8 +471,6 @@ func (u *UserUseCase) UpdateUserContact(updateUserContact dto.UpdateUserContact)
 		WhatsappNumber:   updateUserContact.WhatsappNumber,
 	}
 
-	log.Println(userContact)
-
 	err := u.userRepo.UpdateUserContact(&userContact)
 	if err != nil {
 		return dto.ResponseUpdateUserContact{}, err
@@ -490,8 +500,6 @@ func (u *UserUseCase) UpdateUserEducation(updateUserEducation dto.UpdateUserEduc
 		YearStarted:   updateUserEducation.YearStarted,
 		YearEnded:     updateUserEducation.YearEnded,
 	}
-
-	log.Println(userEducation)
 
 	err := u.userRepo.UpdateUserEducation(&userEducation)
 	if err != nil {
@@ -535,8 +543,6 @@ func (u *UserUseCase) UpdateUserEmployment(updateUserEmployment dto.UpdateUserEm
 		TotalWorkExperience: updateUserEmployment.TotalWorkExperience,
 	}
 
-	log.Println(userEmployment)
-
 	err := u.userRepo.UpdateUserEmployment(&userEmployment)
 	if err != nil {
 		return dto.ResponseUpdateUserEmployment{}, err
@@ -563,8 +569,6 @@ func (u *UserUseCase) UpdateUserSeniority(updateUserSeniority dto.UpdateUserSeni
 		UserID: updateUserSeniority.UserID,
 		Year:   updateUserSeniority.Year,
 	}
-
-	log.Println(userSeniority)
 
 	err := u.userRepo.UpdateUserSeniority(&userSeniority)
 	if err != nil {
@@ -597,8 +601,6 @@ func (u *UserUseCase) UpdateUserWorkExperience(updateUserWorkExperience dto.Upda
 		StartDate:      updateUserWorkExperience.StartDate,
 		EndDate:        updateUserWorkExperience.EndDate,
 	}
-
-	log.Println(userWorkExperience)
 
 	err := u.userRepo.UpdateUserWorkExperience(&userWorkExperience)
 	if err != nil {
@@ -671,8 +673,6 @@ func (u *UserUseCase) UpdateUserLink(updateUserLink dto.UpdateUserLink) (dto.Res
 		GitHub:    updateUserLink.GitHub,
 		Other:     updateUserLink.Other,
 	}
-
-	log.Println(userLink)
 
 	err := u.userRepo.UpdateUserLink(&userLink)
 	if err != nil {

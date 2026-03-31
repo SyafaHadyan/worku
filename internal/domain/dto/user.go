@@ -190,6 +190,10 @@ type ResponseGetUserLink struct {
 	Other     string `json:"other"`
 }
 
+type ResponseGetUserSubscription struct {
+	ExpiryDate time.Time `json:"expiry_date"`
+}
+
 type UpdateUserInfo struct {
 	ID       uuid.UUID `json:"id"`
 	Email    string    `json:"email" validate:"omitempty,email"`
