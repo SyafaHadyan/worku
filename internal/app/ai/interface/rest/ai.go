@@ -34,11 +34,11 @@ func NewAIHandler(
 
 	routerGroup = routerGroup.Group("/ai")
 
-	routerGroup.Post("/interview/new", middleware.Authentication, aiHandler.NewAIInterview)
-	routerGroup.Post("/interview", middleware.Authentication, aiHandler.ContinueAIInterview)
-	routerGroup.Post("/interview/transcribe", middleware.Authentication, aiHandler.Transcribe)
-	routerGroup.Post("/cv/upload", middleware.Authentication, aiHandler.UploadCV)
-	routerGroup.Post("/cv/analyze", middleware.Authentication, aiHandler.AnalyzeCV)
+	routerGroup.Post("/interview/new", middleware.Authentication, middleware.PaidUser, aiHandler.NewAIInterview)
+	routerGroup.Post("/interview", middleware.Authentication, middleware.PaidUser, aiHandler.ContinueAIInterview)
+	routerGroup.Post("/interview/transcribe", middleware.Authentication, middleware.PaidUser, aiHandler.Transcribe)
+	routerGroup.Post("/cv/upload", middleware.Authentication, middleware.PaidUser, aiHandler.UploadCV)
+	routerGroup.Post("/cv/analyze", middleware.Authentication, middleware.PaidUser, aiHandler.AnalyzeCV)
 }
 
 func (h *AIHandler) NewAIInterview(ctx *fiber.Ctx) error {

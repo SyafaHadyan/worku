@@ -64,8 +64,6 @@ func Start() *Bootstrap {
 
 	app := fiberapp.New(config)
 
-	middleware := middleware.NewMiddleware(*jwt)
-
 	userRepository := userrepository.NewUserDB(database)
 	courseRepository := courserepository.NewCourseDB(database)
 	aiRepository := airepository.NewAIDB(database)
@@ -75,6 +73,8 @@ func Start() *Bootstrap {
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
 	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai)
 	paymentUseCase := paymentusecase.NewPaymentuseCase(paymentRepository, payment, config)
+
+	middleware := middleware.NewMiddleware(*jwt, userUseCase)
 
 	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, config)
 	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
