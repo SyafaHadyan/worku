@@ -5,6 +5,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/SyafaHadyan/worku/internal/app/user/usecase"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
@@ -52,18 +53,26 @@ func NewUserHandler(
 	routerGroup.Patch("/info/workexperience", middleware.Authentication, userHandler.UpdateUserWorkExperience)
 	routerGroup.Post("/info/hardskill", middleware.Authentication, userHandler.AddUserHardSkill)
 	routerGroup.Post("/info/softskill", middleware.Authentication, userHandler.AddUserSoftSkill)
-	routerGroup.Post("/info/tools", middleware.Authentication, userHandler.AddUserTools)
+	routerGroup.Post("/info/tool", middleware.Authentication, userHandler.AddUserTools)
 	routerGroup.Patch("/info/link", middleware.Authentication, userHandler.UpdateUserLink)
 	routerGroup.Get("/auth/google", userHandler.GoogleLogin)
 	routerGroup.Get("/auth/google/callback", userHandler.GoogleCallback)
 	routerGroup.Get("/info", middleware.Authentication, userHandler.GetUserInfo)
 	routerGroup.Get("/info/detail", middleware.Authentication, userHandler.GetUserDetail)
 	routerGroup.Get("/info/contact", middleware.Authentication, userHandler.GetUserContact)
+	routerGroup.Get("/info/education", middleware.Authentication, userHandler.GetUserEducation)
 	routerGroup.Get("/info/language", middleware.Authentication, userHandler.GetUserLanguage)
+	routerGroup.Get("/info/employment", middleware.Authentication, userHandler.GetUserEmployment)
+	routerGroup.Get("/info/seniority", middleware.Authentication, userHandler.GetUserSeniority)
+	routerGroup.Get("/info/workexperience", middleware.Authentication, userHandler.GetUserWorkExperience)
+	routerGroup.Get("/info/hardskill", middleware.Authentication, userHandler.GetUserHardSkill)
+	routerGroup.Get("/info/softskill", middleware.Authentication, userHandler.GetUserSoftSkill)
+	routerGroup.Get("/info/tool", middleware.Authentication, userHandler.GetUserTools)
+	routerGroup.Get("/info/link", middleware.Authentication, userHandler.GetUserLink)
 	routerGroup.Delete("/info/language/:language", middleware.Authentication, userHandler.DeleteUserLanguage)
 	routerGroup.Delete("/info/hardskill/:hardskill", middleware.Authentication, userHandler.DeleteUserHardSkill)
 	routerGroup.Delete("/info/softskill/:softskill", middleware.Authentication, userHandler.DeleteUserSoftSkill)
-	routerGroup.Delete("/info/tools/:tools", middleware.Authentication, userHandler.DeleteUserTools)
+	routerGroup.Delete("/info/tool/:tool", middleware.Authentication, userHandler.DeleteUserTools)
 }
 
 func (h *UserHandler) Register(ctx *fiber.Ctx) error {
@@ -762,6 +771,29 @@ func (h *UserHandler) GetUserContact(ctx *fiber.Ctx) error {
 	})
 }
 
+func (h *UserHandler) GetUserEducation(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserEducation(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user education",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user education",
+		"payload": res,
+	})
+}
+
 func (h *UserHandler) GetUserLanguage(ctx *fiber.Ctx) error {
 	userID, err := uuid.Parse(ctx.Locals("userID").(string))
 	if err != nil {
@@ -785,6 +817,167 @@ func (h *UserHandler) GetUserLanguage(ctx *fiber.Ctx) error {
 	})
 }
 
+func (h *UserHandler) GetUserEmployment(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserEmployment(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user employment",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user employment",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserSeniority(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserSeniority(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user seniority",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user seniority",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserWorkExperience(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserWorkExperience(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user work experience",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user work experience",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserHardSkill(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserHardSkill(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user hard skill",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user hard skill",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserSoftSkill(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserSoftSkill(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user soft skill",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user soft skill",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserTools(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserTools(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user tools",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user tools",
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) GetUserLink(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	res, err := h.UserUseCase.GetUserLink(userID)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get user link",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved user link",
+		"payload": res,
+	})
+}
+
 func (h *UserHandler) DeleteUserLanguage(ctx *fiber.Ctx) error {
 	userID, err := uuid.Parse(ctx.Locals("userID").(string))
 	if err != nil {
@@ -795,6 +988,7 @@ func (h *UserHandler) DeleteUserLanguage(ctx *fiber.Ctx) error {
 	}
 
 	targetLanguage := ctx.Params("language")
+	targetLanguage = strings.Replace(targetLanguage, "%20", " ", -1)
 
 	deleteUserLanguage := dto.DeleteUserLanguage{
 		UserID:         userID,
@@ -827,6 +1021,7 @@ func (h *UserHandler) DeleteUserHardSkill(ctx *fiber.Ctx) error {
 	}
 
 	targetHardSkill := ctx.Params("hardskill")
+	targetHardSkill = strings.Replace(targetHardSkill, "%20", " ", -1)
 
 	deleteUserHardSkill := dto.DeleteUserHardSkill{
 		UserID:    userID,
@@ -859,6 +1054,7 @@ func (h *UserHandler) DeleteUserSoftSkill(ctx *fiber.Ctx) error {
 	}
 
 	targetSoftSkill := ctx.Params("softskill")
+	targetSoftSkill = strings.Replace(targetSoftSkill, "%20", " ", -1)
 
 	deleteUserSoftSkill := dto.DeleteUserSoftSkill{
 		UserID:    userID,
@@ -890,7 +1086,7 @@ func (h *UserHandler) DeleteUserTools(ctx *fiber.Ctx) error {
 		)
 	}
 
-	targetTools := ctx.Params("tools")
+	targetTools := ctx.Params("tool")
 
 	deleteUserTools := dto.DeleteUserTools{
 		UserID: userID,
