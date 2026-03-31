@@ -143,11 +143,10 @@ type ResponseGetUserContact struct {
 }
 
 type ResponseGetUserEducation struct {
-	UserID        uuid.UUID `json:"user_id"`
-	LastEducation string    `json:"last_education"`
-	Status        string    `json:"status"`
-	YearStarted   uint      `json:"year_started"`
-	YearEnded     uint      `json:"year_ended"`
+	LastEducation string `json:"last_education"`
+	Status        string `json:"status"`
+	YearStarted   uint   `json:"year_started"`
+	YearEnded     uint   `json:"year_ended"`
 }
 
 type ResponseGetUserLanguage struct {
@@ -155,18 +154,15 @@ type ResponseGetUserLanguage struct {
 }
 
 type ResponseGetUserEmployment struct {
-	UserID              uuid.UUID `json:"user_id"`
-	CurrentStatus       string    `json:"current_status"`
-	TotalWorkExperience uint      `json:"total_work_experience"`
+	CurrentStatus       string `json:"current_status"`
+	TotalWorkExperience uint   `json:"total_work_experience"`
 }
 
 type ResponseGetUserSeniority struct {
-	UserID uuid.UUID `json:"user_id"`
-	Year   uint      `json:"year"`
+	Year uint `json:"year"`
 }
 
 type ResponseGetUserWorkExperience struct {
-	UserID         uuid.UUID `json:"user_id"`
 	JobTitle       string    `json:"job_title"`
 	CompanyName    string    `json:"company_name"`
 	Industry       string    `json:"industry"`
@@ -188,11 +184,10 @@ type ResponseGetUserTools struct {
 }
 
 type ResponseGetUserLink struct {
-	UserID    uuid.UUID `json:"user_id"`
-	LinkedIn  string    `json:"linkedin"`
-	Portfolio string    `json:"portfolio"`
-	GitHub    string    `json:"github"`
-	Other     string    `json:"other"`
+	LinkedIn  string `json:"linkedin"`
+	Portfolio string `json:"portfolio"`
+	GitHub    string `json:"github"`
+	Other     string `json:"other"`
 }
 
 type UpdateUserInfo struct {
@@ -218,7 +213,7 @@ type UpdateUserDetail struct {
 	LastName    string    `json:"last_name" validate:"omitempty,min=2,max=128"`
 	NickName    string    `json:"nick_name" validate:"omitempty,min=2,max=128"`
 	Gender      string    `json:"gender" validate:"omitempty,min=1,max=1"`
-	DateOfBirth time.Time `json:"date_of_birth" validate:"omitempty,datetime"`
+	DateOfBirth time.Time `json:"date_of_birth" validate:"omitempty,min=2,max=128"`
 	Nationality string    `json:"nationality" validate:"omitempty,min=2,max=128"`
 	Location    string    `json:"location" validate:"omitempty,min=2,max=128"`
 }
