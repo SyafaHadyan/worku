@@ -14,6 +14,7 @@ import (
 type RedisItf interface {
 	Set(key string, value string)
 	Get(key string) (string, error)
+	Delete(key string)
 }
 
 type Redis struct {
@@ -64,11 +65,17 @@ func Test(r *Redis) {
 func (r *Redis) Set(key string, value string) {
 	ctx := context.Background()
 
-	r.Client.Set(ctx, key, value, time.Duration(r.expiration))
+	duration := time.Duration(r.expiration) * time.Minute
+
+	r.Client.Set(ctx, key, value, duration)
 }
 
 func (r *Redis) Get(key string) (string, error) {
 	value, err := r.Client.Get(context.Background(), key).Result()
 
 	return value, err
+}
+
+func (r *Redis) Delete(key string) {
+	_ = r.Client.Del(context.Background(), key)
 }

@@ -281,7 +281,7 @@ func (h *PaymentHandler) VerifyPayment(ctx *fiber.Ctx) error {
 	}
 
 	err = h.PaymentUseCase.VerifyPayment(verifyPayment)
-	if err == fiber.ErrBadRequest {
+	if err == fiber.ErrBadRequest || err == gorm.ErrRecordNotFound {
 		return fiber.NewError(
 			http.StatusBadRequest,
 			"invalid payment",
