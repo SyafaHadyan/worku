@@ -1111,6 +1111,7 @@ func (h *UserHandler) DeleteUserTools(ctx *fiber.Ctx) error {
 	}
 
 	targetTools := ctx.Params("tool")
+	targetTools = strings.Replace(targetTools, "%20", " ", -1)
 
 	deleteUserTools := dto.DeleteUserTools{
 		UserID: userID,
