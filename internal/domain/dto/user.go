@@ -217,7 +217,7 @@ type UpdateUserDetail struct {
 	LastName    string    `json:"last_name" validate:"omitempty,min=2,max=128"`
 	NickName    string    `json:"nick_name" validate:"omitempty,min=2,max=128"`
 	Gender      string    `json:"gender" validate:"omitempty,min=1,max=1"`
-	DateOfBirth time.Time `json:"date_of_birth" validate:"omitempty,min=2,max=128"`
+	DateOfBirth time.Time `json:"date_of_birth" validate:"omitempty"`
 	Nationality string    `json:"nationality" validate:"omitempty,min=2,max=128"`
 	Location    string    `json:"location" validate:"omitempty,min=2,max=128"`
 }
@@ -300,8 +300,8 @@ type UpdateUserWorkExperience struct {
 	CompanyName    string    `json:"company_name" validate:"omitempty,min=2,max=256"`
 	Industry       string    `json:"industry" validate:"omitempty,min=2,max=256"`
 	EmploymentType string    `json:"employment_type" validate:"omitempty,min=2,max=256"`
-	StartDate      time.Time `json:"start_date" validate:"omitempty,datetime"`
-	EndDate        time.Time `json:"end_date" validate:"omitempty,datetime"`
+	StartDate      time.Time `json:"start_date" validate:"omitempty"`
+	EndDate        time.Time `json:"end_date" validate:"omitempty"`
 }
 
 type ResponseUpdateUserWorkExperience struct {
