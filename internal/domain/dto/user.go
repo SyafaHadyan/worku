@@ -240,10 +240,9 @@ type UpdateUserContact struct {
 }
 
 type ResponseUpdateUserContact struct {
-	UserID           uuid.UUID `json:"user_id"`
-	AlternativeEmail string    `json:"alternative_email"`
-	PhoneNumber      string    `json:"phone_number"`
-	WhatsappNumber   string    `json:"whatsapp_number"`
+	AlternativeEmail string `json:"alternative_email"`
+	PhoneNumber      string `json:"phone_number"`
+	WhatsappNumber   string `json:"whatsapp_number"`
 }
 
 type UpdateUserEducation struct {
@@ -255,11 +254,10 @@ type UpdateUserEducation struct {
 }
 
 type ResponseUpdateUserEducation struct {
-	UserID        uuid.UUID `json:"user_id"`
-	LastEducation string    `json:"last_education"`
-	Status        string    `json:"status"`
-	YearStarted   uint      `json:"year_started"`
-	YearEnded     uint      `json:"year_ended"`
+	LastEducation string `json:"last_education"`
+	Status        string `json:"status"`
+	YearStarted   uint   `json:"year_started"`
+	YearEnded     uint   `json:"year_ended"`
 }
 
 type AddUserLanguage struct {
@@ -279,9 +277,8 @@ type UpdateUserEmployment struct {
 }
 
 type ResponseUpdateUserEmployment struct {
-	UserID              uuid.UUID `json:"user_id"`
-	CurrentStatus       string    `json:"current_status"`
-	TotalWorkExperience uint      `json:"total_work_experience"`
+	CurrentStatus       string `json:"current_status"`
+	TotalWorkExperience uint   `json:"total_work_experience"`
 }
 
 type UpdateUserSeniority struct {
@@ -290,8 +287,7 @@ type UpdateUserSeniority struct {
 }
 
 type ResponseUpdateUserSeniority struct {
-	UserID uuid.UUID `json:"user_id"`
-	Year   uint      `json:"year"`
+	Year uint `json:"year"`
 }
 
 type UpdateUserWorkExperience struct {
@@ -305,7 +301,6 @@ type UpdateUserWorkExperience struct {
 }
 
 type ResponseUpdateUserWorkExperience struct {
-	UserID         uuid.UUID `json:"user_id"`
 	JobTitle       string    `json:"job_title"`
 	CompanyName    string    `json:"company_name"`
 	Industry       string    `json:"industry"`
@@ -353,9 +348,8 @@ type UpdateUserLink struct {
 }
 
 type ResponseUpdateUserLink struct {
-	UserID    uuid.UUID `json:"user_id"`
-	LinkedIn  string    `json:"linkedin"`
-	Portfolio string    `json:"portfolio"`
-	GitHub    string    `json:"github"`
-	Other     string    `json:"other"`
+	LinkedIn  string `json:"linkedin"`
+	Portfolio string `json:"portfolio"`
+	GitHub    string `json:"github"`
+	Other     string `json:"other"`
 }
