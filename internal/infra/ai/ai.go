@@ -51,7 +51,7 @@ func Test(a *AI) {
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(constants.TestOpenAIConnection),
 		},
-		Model: a.env.OpenAITextModel,
+		Model: a.env.OpenAIFastTextModel,
 	})
 	if err != nil {
 		log.Panic("openai connection failed")
@@ -62,7 +62,7 @@ func Test(a *AI) {
 
 func (a *AI) NewAIInterview(ctx context.Context, newAIInterview dto.NewAIInterview) (string, string, error) {
 	params := responses.ResponseNewParams{
-		Model:        a.env.OpenAITextModel,
+		Model:        a.env.OpenAIComprehensiveTextModel,
 		Instructions: openai.String(string(constants.Interview)),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(fmt.Sprintf("%+v", newAIInterview)),
@@ -76,7 +76,7 @@ func (a *AI) NewAIInterview(ctx context.Context, newAIInterview dto.NewAIIntervi
 
 func (a *AI) ContinueAIInterview(ctx context.Context, continueAIInterview dto.ContinueAIInterview) (string, string, error) {
 	params := responses.ResponseNewParams{
-		Model:              a.env.OpenAITextModel,
+		Model:              a.env.OpenAIComprehensiveTextModel,
 		PreviousResponseID: openai.String(continueAIInterview.PreviousResponseID),
 		Input: responses.ResponseNewParamsInputUnion{
 			OfString: openai.String(continueAIInterview.Input),
@@ -161,8 +161,14 @@ func (a *AI) UploadCV(ctx context.Context, file *multipart.FileHeader) (string, 
 }
 
 func (a *AI) AnalyzeCV(ctx context.Context, analyzeCV dto.AnalyzeCV) (string, error) {
+	model := a.env.OpenAIFastTextModel
+
+	if analyzeCV.ComprehensiveModel {
+		model = a.env.OpenAIComprehensiveTextModel
+	}
+
 	params := responses.ResponseNewParams{
-		Model:        a.env.OpenAITextModel,
+		Model:        model,
 		Instructions: openai.String(string(constants.AnalyzeCV)),
 	}
 
