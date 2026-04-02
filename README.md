@@ -10,6 +10,7 @@ cp .env.example .env; vim .env
 
 |Variable|Value|
 |:---|:---|
+
 |`LIMITER_MAX`|Max number of recent connections during `LIMITER_EXPIRATION_MINUTE` before sending a 429 response|
 |`LIMITER_EXPIRATION_MINUTE`|Time before resetting the `LIMITER_MAX` count|
 |`APP_PORT`|The backend server will run on this port (make sure to not use well-known port (0 - 1023))|
@@ -26,6 +27,18 @@ cp .env.example .env; vim .env
 |`REDIS_EXPIRATION`|Redis cache expiration (in minutes)|
 |`JWT_SECRET_KEY`|JWT secret key|
 |`JWT_EXPIRED_DAYS`|JWT expiration (in days)|
+|`GOOGLE_CLIENT_ID`|Google Client ID|
+|`GOOGLE_CLIENT_SECRET`|Google Client Secret|
+|`GOOGLE_REDIRECT_URL`|Google Redirect URL|
+|`MIDTRANS_SERVER_KEY`|Midtrans Server Key|
+|`MIDTRANS_CLIENT_KEY`|Midtrans Client Key|
+|`MIDTRANS_CLIENT_ID`|Midtrans Client ID|
+|`MIDTRANS_CLIENT_SECRET`|Midtrans Client Secret|
+|`OPENAI_API_KEY`|OpenAI API Key|
+|`OPENAI_FAST_TEXT_MODEL`|OpenAI fast text model|
+|`OPENAI_COMPREHENSIVE_TEXT_MODEL`|OpenAI comprehensive text model|
+|`OPENAI_TRANSCRIBE_MODEL`|OpenAI transcribe model|
+|`OPENAI_FILE_EXPIRY_SECONDS`|OpenAI file expiry (in seconds)|
 
 - Run MySQL Container
 
