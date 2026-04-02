@@ -3,6 +3,7 @@ package repository
 
 import (
 	"github.com/SyafaHadyan/worku/internal/domain/entity"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -11,6 +12,7 @@ type UserDBItf interface {
 	Register(user *entity.User) error
 	Login(user *entity.User) error
 	GoogleOAuth(user *entity.User) error
+	UploadProfilePicture(userID uuid.UUID, profilePictureURL string) error
 	UpdateUserInfo(user *entity.User) error
 	UpdateUserDetail(userDetail *entity.UserDetail) error
 	UpdateUserContact(userContact *entity.UserContact) error
@@ -81,6 +83,14 @@ func (r *UserDB) GoogleOAuth(user *entity.User) error {
 		Model(user).
 		Where("users.email = ?", user.Email).
 		First(user).
+		Error
+}
+
+func (r *UserDB) UploadProfilePicture(userID uuid.UUID, profilePictureURL string) error {
+	return r.db.Debug().
+		Model(&entity.User{}).
+		Where("id = ?", userID).
+		Update("profile_picture", profilePictureURL).
 		Error
 }
 

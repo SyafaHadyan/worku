@@ -31,12 +31,13 @@ type Login struct {
 }
 
 type ResponseLogin struct {
-	ID        uuid.UUID `json:"id"`
-	Email     string    `json:"email"`
-	Username  string    `json:"username"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID             uuid.UUID `json:"id"`
+	Email          string    `json:"email"`
+	Username       string    `json:"username"`
+	Name           string    `json:"name"`
+	ProfilePicture string    `json:"profile_picture"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
 }
 
 type ResponseGoogleOAuth struct {
@@ -62,11 +63,12 @@ type GetUserID struct {
 }
 
 type ResponseGetUserInfo struct {
-	ID         uuid.UUID `json:"id"`
-	Email      string    `json:"email"`
-	Username   string    `json:"username"`
-	Name       string    `json:"name"`
-	UserDetail struct {
+	ID             uuid.UUID `json:"id"`
+	Email          string    `json:"email"`
+	Username       string    `json:"username"`
+	Name           string    `json:"name"`
+	ProfilePicture string    `json:"profile_picture"`
+	UserDetail     struct {
 		FirstName   string    `json:"first_name"`
 		LastName    string    `json:"last_name"`
 		NickName    string    `json:"nick_name"`

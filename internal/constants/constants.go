@@ -8,6 +8,12 @@ const (
 	DefaultLimit Pagination = "8"
 )
 
+type S3 string
+
+const (
+	ProfileDirectory S3 = "profile"
+)
+
 type AIInstruction string
 
 const (
