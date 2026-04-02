@@ -38,7 +38,8 @@ type Env struct {
 	MidtransClientID                  string `env:"MIDTRANS_CLIENT_ID"`
 	MidtransClientSecret              string `env:"MIDTRANS_CLIENT_SECRET"`
 	OpenAIAPIKey                      string `env:"OPENAI_API_KEY"`
-	OpenAITextModel                   string `env:"OPENAI_TEXT_MODEL"`
+	OpenAIFastTextModel               string `env:"OPENAI_FAST_TEXT_MODEL"`
+	OpenAIComprehensiveTextModel      string `env:"OPENAI_COMPREHENSIVE_TEXT_MODEL"`
 	OpenAITranscribeModel             string `env:"OPENAI_TRANSCRIBE_MODEL"`
 	OpenAIFileExpirySeconds           int64  `env:"OPENAI_FILE_EXPIRY_SECONDS"`
 }
