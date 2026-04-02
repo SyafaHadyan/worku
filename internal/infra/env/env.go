@@ -42,6 +42,11 @@ type Env struct {
 	OpenAIComprehensiveTextModel      string `env:"OPENAI_COMPREHENSIVE_TEXT_MODEL"`
 	OpenAITranscribeModel             string `env:"OPENAI_TRANSCRIBE_MODEL"`
 	OpenAIFileExpirySeconds           int64  `env:"OPENAI_FILE_EXPIRY_SECONDS"`
+	S3URL                             string `env:"S3_URL"`
+	S3AccountID                       string `env:"S3_ACCOUNT_ID"`
+	S3BucketName                      string `env:"S3_BUCKET_NAME"`
+	S3AccessKeyID                     string `env:"S3_ACCESS_KEY_ID"`
+	S3AccessKeySecret                 string `env:"S3_ACCESS_KEY_SECRET"`
 }
 
 func New() *Env {

@@ -35,11 +35,17 @@ printf "MIDTRANS_CLIENT_KEY=%s\n" $MIDTRANS_CLIENT_KEY >>.env
 printf "MIDTRANS_CLIENT_ID=%s\n" $MIDTRANS_CLIENT_ID >>.env
 printf "MIDTRANS_CLIENT_SECRET=%s\n" $MIDTRANS_CLIENT_SECRET >>.env
 
-printf "OPENAI_API_KEY=change=%s\n" $OPENAI_API_KEY >>.env
+printf "OPENAI_API_KEY=%s\n" $OPENAI_API_KEY >>.env
 printf "OPENAI_FAST_TEXT_MODEL=%s\n" $OPENAI_FAST_TEXT_MODEL >>.env
 printf "OPENAI_COMPREHENSIVE_TEXT_MODEL=%s\n" $OPENAI_COMPREHENSIVE_TEXT_MODEL >>.env
 printf "OPENAI_TRANSCRIBE_MODEL=%s\n" $OPENAI_TRANSCRIBE_MODEL >>.env
 printf "OPENAI_FILE_EXPIRY_SECONDS=%s\n" $OPENAI_FILE_EXPIRY_SECONDS >>.env
+
+printf "S3_URL=%s\n" $S3_URL >>.env
+printf "S3_ACCOUNT_ID=%s\n" $S3_ACCOUNT_ID >>.env
+printf "S3_BUCKET_NAME=%s\n" $S3_BUCKET_NAME >>.env
+printf "S3_ACCESS_KEY_ID=%s\n" $S3_ACCESS_KEY_ID >>.env
+printf "S3_ACCESS_KEY_SECRET=%s\n" $S3_ACCESS_KEY_SECRET >>.env
 
 printf "%s\n" "done setting up environment variables"
 printf "%s\n" "starting application"

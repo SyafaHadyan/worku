@@ -25,6 +25,7 @@ import (
 	googleoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/google"
 	"github.com/SyafaHadyan/worku/internal/infra/payment"
 	"github.com/SyafaHadyan/worku/internal/infra/redis"
+	"github.com/SyafaHadyan/worku/internal/infra/s3"
 	"github.com/SyafaHadyan/worku/internal/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
@@ -56,6 +57,8 @@ func Start() *Bootstrap {
 
 	ai := ai.New(config)
 
+	s3 := s3.New(config)
+
 	jwt := jwt.New(config)
 
 	googleoauth2 := googleoauth2.New(config)
@@ -69,7 +72,7 @@ func Start() *Bootstrap {
 	aiRepository := airepository.NewAIDB(database)
 	paymentRepository := paymentrepository.NewPaymentDB(database)
 
-	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis)
+	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis, s3, config)
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
 	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai)
 	paymentUseCase := paymentusecase.NewPaymentuseCase(paymentRepository, payment, config)

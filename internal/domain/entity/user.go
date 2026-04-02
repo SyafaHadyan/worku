@@ -18,6 +18,7 @@ type User struct {
 	Username           string    `gorm:"type:nvarchar(32);not null;unique"`
 	Password           string    `gorm:"type:text;not null"`
 	Name               string    `gorm:"type:nvarchar(128)"`
+	ProfilePicture     string    `gorm:"type:nvarchar(512)"`
 	UserDetail         UserDetail
 	UserContact        UserContact
 	UserEducation      UserEducation

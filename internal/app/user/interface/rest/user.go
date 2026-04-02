@@ -57,6 +57,7 @@ func NewUserHandler(
 	routerGroup.Patch("/info/link", middleware.Authentication, userHandler.UpdateUserLink)
 	routerGroup.Get("/auth/google", userHandler.GoogleLogin)
 	routerGroup.Get("/auth/google/callback", userHandler.GoogleCallback)
+	routerGroup.Post("/profile/upload", middleware.Authentication, userHandler.UploadProfilePicture)
 	routerGroup.Get("/info", middleware.Authentication, userHandler.GetUserInfo)
 	routerGroup.Get("/info/detail", middleware.Authentication, userHandler.GetUserDetail)
 	routerGroup.Get("/info/contact", middleware.Authentication, userHandler.GetUserContact)
@@ -699,6 +700,38 @@ func (h *UserHandler) GoogleCallback(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "successfully logged in with google",
 		"token":   token,
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) UploadProfilePicture(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
+	file, err := ctx.FormFile("picture")
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"failed to upload voice",
+		)
+	}
+
+	res, err := h.UserUseCase.UploadProfilePicture(userID, *file)
+	if err != nil {
+		return fiber.NewError(
+
+			http.StatusServiceUnavailable,
+			"failed to connect to 3rd party service",
+		)
+	}
+
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"message": "successfully uploaded profile picture",
 		"payload": res,
 	})
 }

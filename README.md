@@ -38,6 +38,11 @@ cp .env.example .env; vim .env
 |`OPENAI_COMPREHENSIVE_TEXT_MODEL`|OpenAI comprehensive text model|
 |`OPENAI_TRANSCRIBE_MODEL`|OpenAI transcribe model|
 |`OPENAI_FILE_EXPIRY_SECONDS`|OpenAI file expiry (in seconds)|
+|`S3_URL`|S3 URL|
+|`S3_ACCOUNT_ID`|S3 Account ID|
+|`S3_BUCKET_NAME`|S3 bucket name|
+|`S3_ACCESS_KEY_ID`|SE Access Key ID|
+|`S3_ACCESS_KEY_SECRET`|S3 Access Key Secret|
 
 - Run MySQL Container
 

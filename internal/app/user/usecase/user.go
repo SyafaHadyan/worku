@@ -5,13 +5,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 
 	"github.com/SyafaHadyan/worku/internal/app/user/repository"
+	"github.com/SyafaHadyan/worku/internal/constants"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/domain/entity"
+	"github.com/SyafaHadyan/worku/internal/infra/env"
 	"github.com/SyafaHadyan/worku/internal/infra/jwt"
 	redisitf "github.com/SyafaHadyan/worku/internal/infra/redis"
+	s3itf "github.com/SyafaHadyan/worku/internal/infra/s3"
+	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,6 +27,7 @@ type UserUseCaseItf interface {
 	Register(register dto.Register) (dto.ResponseRegister, error)
 	Login(login dto.Login) (dto.ResponseLogin, string, error)
 	GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error)
+	UploadProfilePicture(userID uuid.UUID, file multipart.FileHeader) (dto.ResponseGetUserInfo, error)
 	GetUserIDFromUsername(username string) (uuid.UUID, error)
 	GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, error)
 	GetUserDetail(userID uuid.UUID) (dto.ResponseGetUserDetail, error)
@@ -59,17 +66,24 @@ type UserUseCase struct {
 	jwt          jwt.JWTItf
 	redis        redisitf.RedisItf
 	redisContext context.Context
+	s3           s3itf.S3Itf
+	s3Context    context.Context
+	env          *env.Env
 }
 
 func NewUserUseCase(
 	userRepo repository.UserDBItf, jwt *jwt.JWT,
-	redis redisitf.RedisItf,
+	redis redisitf.RedisItf, s3 s3itf.S3Itf,
+	env *env.Env,
 ) UserUseCaseItf {
 	return &UserUseCase{
 		userRepo:     userRepo,
 		jwt:          jwt,
 		redis:        redis,
 		redisContext: context.Background(),
+		s3:           s3,
+		s3Context:    context.Background(),
+		env:          env,
 	}
 }
 
@@ -154,6 +168,42 @@ func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (
 	}
 
 	return user.ParseToDTOResponseLogin(), token, nil
+}
+
+func (u *UserUseCase) UploadProfilePicture(userID uuid.UUID, file multipart.FileHeader) (dto.ResponseGetUserInfo, error) {
+	fileContent, err := file.Open()
+	if err != nil {
+		return dto.ResponseGetUserInfo{}, fiber.ErrBadRequest
+	}
+
+	byteContainer, err := io.ReadAll(fileContent)
+	if err != nil {
+		return dto.ResponseGetUserInfo{}, fiber.ErrBadRequest
+	}
+
+	objectKey := fmt.Sprintf(
+		"%s/%s",
+		constants.ProfileDirectory,
+		userID.String(),
+	)
+
+	profilePictureURL := fmt.Sprintf(
+		"%s/%s",
+		u.env.S3URL,
+		objectKey,
+	)
+
+	err = u.s3.Upload(u.s3Context, objectKey, byteContainer)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = u.userRepo.UploadProfilePicture(userID, profilePictureURL)
+
+	redisKey := fmt.Sprintf("user:%s", userID.String())
+	u.redis.Delete(redisKey)
+
+	return u.GetUserInfo(userID)
 }
 
 func (u *UserUseCase) GetUserIDFromUsername(username string) (uuid.UUID, error) {
