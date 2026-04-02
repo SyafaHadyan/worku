@@ -3,13 +3,20 @@ package repository
 
 import (
 	"github.com/SyafaHadyan/worku/internal/domain/entity"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type CourseDBItf interface {
+	GetCourseCategory(courseCategory *[]entity.CourseCategory) error
 	GetCourseList(offset *int, limit *int, course *[]entity.Course) error
-	GetCourseInfo(count *int64, course *entity.Course) error
+	GetCourseListByCategory(categoryID uuid.UUID, offset *int, limit *int, course *[]entity.Course) error
 	SearchCourse(offset *int, limit *int, query *string, course *[]entity.Course) error
+	GetCourseInfo(course *entity.Course) error
+	GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.CourseVideo) error
+	GetCourseEnrollmentCount(courseID uuid.UUID) (int64, error)
+	UpdateCourseEnrollment(userCourse *entity.UserCourse) error
 }
 
 type CourseDB struct {
@@ -22,22 +29,29 @@ func NewCourseDB(db *gorm.DB) CourseDBItf {
 	}
 }
 
+func (r *CourseDB) GetCourseCategory(courseCategory *[]entity.CourseCategory) error {
+	return r.db.Debug().
+		Model(&entity.CourseCategory{}).
+		Find(courseCategory).
+		Error
+}
+
 func (r *CourseDB) GetCourseList(offset *int, limit *int, course *[]entity.Course) error {
 	return r.db.Debug().
 		Model(&entity.Course{}).
-		Select("courses.id, courses.name, courses.cover_image, courses.price").
 		Limit(*limit).
 		Offset(*offset).
 		Find(course).
 		Error
 }
 
-func (r *CourseDB) GetCourseInfo(count *int64, course *entity.Course) error {
+func (r *CourseDB) GetCourseListByCategory(categoryID uuid.UUID, offset *int, limit *int, course *[]entity.Course) error {
 	return r.db.Debug().
 		Model(&entity.Course{}).
-		Select("courses.id, courses.name, courses.description, courses.cover_image, courses.price, courses.created_at, courses.updated_at").
-		First(course).
-		Count(count).
+		Where("category_id = ?", categoryID).
+		Limit(*limit).
+		Offset(*offset).
+		Find(course).
 		Error
 }
 
@@ -45,7 +59,7 @@ func (r *CourseDB) SearchCourse(offset *int, limit *int, query *string, course *
 	return r.db.Debug().
 		Model(&entity.Course{}).
 		Raw(`
-		SELECT courses.id, courses.name, courses.cover_image, courses.price
+		SELECT * 
 		FROM courses
 		WHERE MATCH(name,description)
 		AGAINST (? IN NATURAL LANGUAGE MODE)
@@ -53,5 +67,39 @@ func (r *CourseDB) SearchCourse(offset *int, limit *int, query *string, course *
 		`,
 			query, limit, offset).
 		Scan(course).
+		Error
+}
+
+func (r *CourseDB) GetCourseInfo(course *entity.Course) error {
+	return r.db.Debug().
+		Preload(clause.Associations).
+		First(course).
+		Error
+}
+
+func (r *CourseDB) GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.CourseVideo) error {
+	return r.db.Debug().
+		Model(&entity.CourseVideo{}).
+		Where("course_id = ?", courseID).
+		Find(courseVideo).
+		Error
+}
+
+func (r *CourseDB) GetCourseEnrollmentCount(courseID uuid.UUID) (int64, error) {
+	var count int64
+
+	err := r.db.Debug().
+		Model(entity.UserCourse{}).
+		Where("course_id = ?", courseID).
+		Count(&count).
+		Error
+
+	return count, err
+}
+
+func (r *CourseDB) UpdateCourseEnrollment(userCourse *entity.UserCourse) error {
+	return r.db.Debug().
+		Model(&entity.UserCourse{}).
+		Create(userCourse).
 		Error
 }
