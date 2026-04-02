@@ -22,13 +22,13 @@ type AnalyzeCV struct {
 	JobApplicationsSent      string    `json:"job_applications_sent" validate:"required"`
 	BiggestConcern           string    `json:"biggest_concern" validate:"required"`
 	AdditionalRequest        string    `json:"addititional_request"`
+	ComprehensiveModel       bool      `json:"comprehensive_model" validate:"omitempty,boolean"`
 }
 
 type NewAIInterview struct {
 	JobRole       string `json:"job_role" validate:"required"`
 	InterviewType string `json:"interview_type" validate:"required"`
 	Difficulty    string `json:"difficulty" validate:"required"`
-	Input         string `json:"input" validate:"required,min=1,max=8192"`
 }
 
 type ContinueAIInterview struct {

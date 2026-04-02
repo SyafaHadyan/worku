@@ -36,7 +36,9 @@ printf "MIDTRANS_CLIENT_ID=%s\n" $MIDTRANS_CLIENT_ID >>.env
 printf "MIDTRANS_CLIENT_SECRET=%s\n" $MIDTRANS_CLIENT_SECRET >>.env
 
 printf "OPENAI_API_KEY=change=%s\n" $OPENAI_API_KEY >>.env
-printf "OPENAI_ALLLOWED_MODEL=change=%s\n" $OPENAI_ALLLOWED_MODEL >>.env
+printf "OPENAI_FAST_TEXT_MODEL=%s\n" $OPENAI_FAST_TEXT_MODEL >>.env
+printf "OPENAI_COMPREHENSIVE_TEXT_MODEL=%s\n" $OPENAI_COMPREHENSIVE_TEXT_MODEL >>.env
+printf "OPENAI_TRANSCRIBE_MODEL=%s\n" $OPENAI_TRANSCRIBE_MODEL >>.env
 printf "OPENAI_FILE_EXPIRY_SECONDS=%s\n" $OPENAI_FILE_EXPIRY_SECONDS >>.env
 
 printf "%s\n" "done setting up environment variables"
