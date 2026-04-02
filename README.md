@@ -10,7 +10,6 @@ cp .env.example .env; vim .env
 
 |Variable|Value|
 |:---|:---|
-
 |`LIMITER_MAX`|Max number of recent connections during `LIMITER_EXPIRATION_MINUTE` before sending a 429 response|
 |`LIMITER_EXPIRATION_MINUTE`|Time before resetting the `LIMITER_MAX` count|
 |`APP_PORT`|The backend server will run on this port (make sure to not use well-known port (0 - 1023))|
