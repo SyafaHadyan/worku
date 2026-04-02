@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/SyafaHadyan/worku/internal/app/payment/usecase"
+	"github.com/SyafaHadyan/worku/internal/constants"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/middleware"
 	"github.com/go-playground/validator/v10"
@@ -227,7 +228,7 @@ func (h *PaymentHandler) GetOrderList(ctx *fiber.Ctx) error {
 		)
 	}
 
-	offset, err := strconv.Atoi(ctx.Params("page", "0"))
+	offset, err := strconv.Atoi(ctx.Params("page", string(constants.DefaultPage)))
 	if err != nil || offset < 0 {
 		return fiber.NewError(
 			http.StatusBadRequest,
@@ -235,7 +236,7 @@ func (h *PaymentHandler) GetOrderList(ctx *fiber.Ctx) error {
 		)
 	}
 
-	limit, err := strconv.Atoi(ctx.Params("limit", "8"))
+	limit, err := strconv.Atoi(ctx.Params("limit", string(constants.DefaultLimit)))
 	if err != nil || limit <= 0 {
 		return fiber.NewError(
 			http.StatusBadRequest,

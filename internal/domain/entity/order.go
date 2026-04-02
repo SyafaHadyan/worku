@@ -10,12 +10,12 @@ import (
 )
 
 type Order struct {
-	ID           uuid.UUID      `json:"id" gorm:"type:char(36);primaryKey"`
-	UserID       uuid.UUID      `json:"user_id" gorm:"type:char(36);"`
-	DurationDays int            `json:"duration" gorm:"type:integer"`
-	Status       string         `json:"status" gorm:"type:nvarchar(128)"`
-	CreatedAt    time.Time      `json:"created_at" gorm:"type:timestamp;autoCreateTime"`
-	UpdatedAt    time.Time      `json:"updated_at" gorm:"type:timestamp;autoUpdateTime"`
+	ID           uuid.UUID      `gorm:"type:char(36);primaryKey"`
+	UserID       uuid.UUID      `gorm:"type:char(36);"`
+	DurationDays int            `gorm:"type:integer"`
+	Status       string         `gorm:"type:nvarchar(128)"`
+	CreatedAt    time.Time      `gorm:"type:timestamp;autoCreateTime"`
+	UpdatedAt    time.Time      `gorm:"type:timestamp;autoUpdateTime"`
 	DeletedAt    gorm.DeletedAt `gorm:"index"`
 }
 

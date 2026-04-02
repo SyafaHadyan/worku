@@ -117,35 +117,29 @@ type UserSubscription struct {
 
 type UserCourse struct {
 	UserID   uuid.UUID `gorm:"type:char(36);primaryKey"`
-	CourseID string    `gorm:"type:char(36);primaryKey"`
+	CourseID uuid.UUID `gorm:"type:char(36);primaryKey"`
 }
 
 func (u *User) ParseToDTOResponseRegister() dto.ResponseRegister {
-	// TODO: change to copier
-	var responseRegister dto.ResponseRegister
+	var response dto.ResponseRegister
 
-	responseRegister.ID = u.ID
-	responseRegister.Email = u.Email
-	responseRegister.Username = u.Username
-	responseRegister.Name = u.Name
-	responseRegister.CreatedAt = u.CreatedAt
-	responseRegister.UpdatedAt = u.UpdatedAt
+	err := copier.Copy(&response, u)
+	if err != nil {
+		log.Println(err)
+	}
 
-	return responseRegister
+	return response
 }
 
 func (u *User) ParseToDTOResponseLogin() dto.ResponseLogin {
-	// TODO: change to copier
-	var responseLogin dto.ResponseLogin
+	var response dto.ResponseLogin
 
-	responseLogin.ID = u.ID
-	responseLogin.Email = u.Email
-	responseLogin.Username = u.Username
-	responseLogin.Name = u.Name
-	responseLogin.CreatedAt = u.CreatedAt
-	responseLogin.UpdatedAt = u.UpdatedAt
+	err := copier.Copy(&response, u)
+	if err != nil {
+		log.Println(err)
+	}
 
-	return responseLogin
+	return response
 }
 
 func (u *User) ParseToDTOResponseGetUserInfo() dto.ResponseGetUserInfo {
