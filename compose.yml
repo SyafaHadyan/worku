@@ -1,5 +1,5 @@
 services:
-  bcc-canteen:
+  worku:
     image: syafa/worku:latest
     container_name: worku
     restart: always
