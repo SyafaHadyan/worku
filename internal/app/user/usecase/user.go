@@ -193,9 +193,6 @@ func (u *UserUseCase) UploadProfilePicture(userID uuid.UUID, file multipart.File
 		objectKey,
 	)
 
-	log.Println(objectKey)
-	log.Println(profilePictureURL)
-
 	err = u.s3.Upload(u.s3Context, objectKey, byteContainer)
 	if err != nil {
 		log.Println(err)
