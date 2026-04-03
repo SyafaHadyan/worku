@@ -11,6 +11,9 @@ import (
 	coursehandler "github.com/SyafaHadyan/worku/internal/app/course/interface/rest"
 	courserepository "github.com/SyafaHadyan/worku/internal/app/course/repository"
 	courseusecase "github.com/SyafaHadyan/worku/internal/app/course/usecase"
+	jobhandler "github.com/SyafaHadyan/worku/internal/app/job/interface/rest"
+	jobrepository "github.com/SyafaHadyan/worku/internal/app/job/repository"
+	jobusecase "github.com/SyafaHadyan/worku/internal/app/job/usecase"
 	paymenthandler "github.com/SyafaHadyan/worku/internal/app/payment/interface/rest"
 	paymentrepository "github.com/SyafaHadyan/worku/internal/app/payment/repository"
 	paymentusecase "github.com/SyafaHadyan/worku/internal/app/payment/usecase"
@@ -69,11 +72,13 @@ func Start() *Bootstrap {
 
 	userRepository := userrepository.NewUserDB(database)
 	courseRepository := courserepository.NewCourseDB(database)
+	jobRepository := jobrepository.NewJobDB(database)
 	aiRepository := airepository.NewAIDB(database)
 	paymentRepository := paymentrepository.NewPaymentDB(database)
 
 	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis, s3, config)
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
+	jobUseCase := jobusecase.NewJobUseCase(jobRepository, redis, s3, config)
 	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai, s3, config)
 	paymentUseCase := paymentusecase.NewPaymentuseCase(paymentRepository, payment, config)
 
@@ -81,6 +86,7 @@ func Start() *Bootstrap {
 
 	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, config)
 	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
+	jobhandler.NewJobHandler(app.Router, validator, middleware, jobUseCase)
 	aihandler.NewAIHandler(app.Router, validator, decoder, middleware, aiUseCase)
 	paymenthandler.NewPaymentHandler(app.Router, validator, middleware, paymentUseCase)
 
