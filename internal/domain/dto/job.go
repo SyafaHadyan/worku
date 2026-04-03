@@ -30,12 +30,13 @@ type ResponseGetJobInfo struct {
 	SalaryMonthRangeLow    uint32    `json:"salary_month_range_low"`
 	SalaryMonthRangeHigh   uint32    `json:"salary_month_range_high"`
 	JobDetail              struct {
-		TeamSize      uint      `json:"team_size"`
-		HiringManager string    `json:"hiring_manager"`
-		WorkSetup     string    `json:"work_setup"`
-		Posted        time.Time `json:"posted_at"`
-		UpdatedAt     time.Time `json:"updated_at"`
-		Deadline      time.Time `json:"deadline"`
+		TeamSize        uint      `json:"team_size"`
+		HiringManager   string    `json:"hiring_manager"`
+		WorkSetup       string    `json:"work_setup"`
+		MatchPercentage uint      `json:"match_percentage"`
+		Posted          time.Time `json:"posted_at"`
+		UpdatedAt       time.Time `json:"updated_at"`
+		Deadline        time.Time `json:"deadline"`
 	} `json:"job_detail"`
 	JobTag []struct {
 		Tag string `json:"tag"`
