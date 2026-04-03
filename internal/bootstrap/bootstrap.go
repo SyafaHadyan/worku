@@ -74,7 +74,7 @@ func Start() *Bootstrap {
 
 	userUseCase := userusecase.NewUserUseCase(userRepository, jwt, redis, s3, config)
 	courseUseCase := courseusecase.NewCourseUseCase(courseRepository, redis)
-	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai)
+	aiUseCase := aiusecase.NewAIUseCase(aiRepository, ai, s3, config)
 	paymentUseCase := paymentusecase.NewPaymentuseCase(paymentRepository, payment, config)
 
 	middleware := middleware.NewMiddleware(*jwt, userUseCase)
