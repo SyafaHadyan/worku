@@ -41,8 +41,6 @@ type UserDBItf interface {
 	GetUserTools(userID uuid.UUID, userTools *[]entity.UserTools) error
 	GetUserLink(userLink *entity.UserLink) error
 	GetUserSubscription(userSubscription *entity.UserSubscription) error
-	CheckUsername(user *entity.User) error
-	GetUserIDFromUsername(user *entity.User) error
 	DeleteUserLanguage(userLanguage *entity.UserLanguage) error
 	DeleteUserHardSkill(userHardSkill *entity.UserHardSkill) error
 	DeleteUserSoftSkill(userSoftSkill *entity.UserSoftSkill) error
@@ -260,14 +258,6 @@ func (r *UserDB) UpdateUserLink(userLink *entity.UserLink) error {
 	return err
 }
 
-func (r *UserDB) CheckUsername(user *entity.User) error {
-	// TODO: remove?
-	return r.db.
-		Raw("SELECT `username` FROM `users` WHERE username = ?", user.Username).
-		First(&user).
-		Error
-}
-
 func (r *UserDB) GetUserInfo(user *entity.User) error {
 	return r.db.
 		Preload(clause.Associations).
@@ -360,15 +350,6 @@ func (r *UserDB) GetUserSubscription(userSubscription *entity.UserSubscription) 
 	return r.db.
 		Model(&entity.UserSubscription{}).
 		First(userSubscription).
-		Error
-}
-
-func (r *UserDB) GetUserIDFromUsername(user *entity.User) error {
-	// TODO: remove
-	return r.db.
-		Select("id").
-		Where("username = ?", user.Username).
-		First(user).
 		Error
 }
 

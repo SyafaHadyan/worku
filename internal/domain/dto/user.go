@@ -56,21 +56,6 @@ type ResponseLinkedInOAuth struct {
 	EmailVerified bool   `json:"email_verified"`
 }
 
-type UserDetail struct {
-	// TODO: remove?
-	UserID uuid.UUID `json:"user_id"`
-}
-
-type CheckUserID struct {
-	// TODO: remove?
-	ID uuid.UUID `json:"id" validate:"required,uuid_rfc4122"`
-}
-
-type GetUserID struct {
-	// TODO: remove?
-	Username string `json:"username" validate:"required,min=3,max=32"`
-}
-
 type ResponseGetUserInfo struct {
 	ID             uuid.UUID `json:"id"`
 	Email          string    `json:"email"`
