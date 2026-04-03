@@ -8,6 +8,20 @@ const (
 	DefaultLimit Pagination = "8"
 )
 
+type BasePrice int64
+
+const (
+	Day   BasePrice = 1500
+	Month BasePrice = 30000
+)
+
+type BaseDiscountPercentage int
+
+const (
+	Month6  BaseDiscountPercentage = 42
+	Month12 BaseDiscountPercentage = 50
+)
+
 type S3 string
 
 const (
