@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/SyafaHadyan/worku/internal/constants"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/infra/env"
 	"github.com/midtrans/midtrans-go"
@@ -21,20 +22,8 @@ type PaymentItf interface {
 }
 
 type Payment struct {
-	Client                      *snap.Client
-	CoreAPIClient               *coreapi.Client
-	basePrice                   BasePrice
-	baseMonthDiscountPercentage BaseMonthDiscountPercentage
-}
-
-type BasePrice struct {
-	Day   int64
-	Month int64
-}
-
-type BaseMonthDiscountPercentage struct {
-	Month6  int
-	Month12 int
+	Client        *snap.Client
+	CoreAPIClient *coreapi.Client
 }
 
 func New(env *env.Env) *Payment {
@@ -47,36 +36,26 @@ func New(env *env.Env) *Payment {
 		Env:       midtrans.Sandbox,
 	}
 
-	BasePrice := BasePrice{
-		Day:   1000,
-		Month: 30000,
-	}
-
-	BaseMonthDiscountPercentage := BaseMonthDiscountPercentage{
-		Month6:  42,
-		Month12: 50,
-	}
-
 	Payment := Payment{
-		Client:                      &SnapClient,
-		CoreAPIClient:               &CoreAPIClient,
-		basePrice:                   BasePrice,
-		baseMonthDiscountPercentage: BaseMonthDiscountPercentage,
+		Client:        &SnapClient,
+		CoreAPIClient: &CoreAPIClient,
 	}
 
 	return &Payment
 }
 
 func (p *Payment) calculatePrice(interval int) int64 {
-	result := p.basePrice.Month
+	result := int64(constants.Month)
 
 	switch interval {
+	case 30:
+		result = int64(constants.Month)
 	case 180:
-		result = (result * int64(100-p.baseMonthDiscountPercentage.Month6) / 100) * 6
+		result = (result * int64(100-int(constants.Month6)) / 100) * 6
 	case 360:
-		result = (result * int64(100-p.baseMonthDiscountPercentage.Month12) / 100) * 12
+		result = (result * int64(100-int(constants.Month12)) / 100) * 12
 	default:
-		result = p.basePrice.Day * int64(interval)
+		result = int64(int(constants.Day) * interval)
 	}
 
 	return result
