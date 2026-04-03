@@ -31,14 +31,14 @@ func NewCourseDB(db *gorm.DB) CourseDBItf {
 }
 
 func (r *CourseDB) GetCourseCategory(courseCategory *[]entity.CourseCategory) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.CourseCategory{}).
 		Find(courseCategory).
 		Error
 }
 
 func (r *CourseDB) GetCourseList(offset *int, limit *int, course *[]entity.Course) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.Course{}).
 		Limit(*limit).
 		Offset(*offset).
@@ -47,7 +47,7 @@ func (r *CourseDB) GetCourseList(offset *int, limit *int, course *[]entity.Cours
 }
 
 func (r *CourseDB) GetCourseListByCategory(categoryID uuid.UUID, offset *int, limit *int, course *[]entity.Course) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.Course{}).
 		Where("category_id = ?", categoryID).
 		Limit(*limit).
@@ -57,7 +57,7 @@ func (r *CourseDB) GetCourseListByCategory(categoryID uuid.UUID, offset *int, li
 }
 
 func (r *CourseDB) SearchCourse(offset *int, limit *int, query *string, course *[]entity.Course) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.Course{}).
 		Raw(`
 		SELECT * 
@@ -72,14 +72,14 @@ func (r *CourseDB) SearchCourse(offset *int, limit *int, query *string, course *
 }
 
 func (r *CourseDB) GetCourseInfo(course *entity.Course) error {
-	return r.db.Debug().
+	return r.db.
 		Preload(clause.Associations).
 		First(course).
 		Error
 }
 
 func (r *CourseDB) GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.CourseVideo) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.CourseVideo{}).
 		Where("course_id = ?", courseID).
 		Find(courseVideo).
@@ -87,7 +87,7 @@ func (r *CourseDB) GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.Cour
 }
 
 func (r *CourseDB) GetCourseModule(courseID uuid.UUID, courseModule *[]entity.CourseModule) error {
-	return r.db.Debug().
+	return r.db.
 		Preload(clause.Associations).
 		Where("course_id = ?", courseID).
 		Find(courseModule).
@@ -97,7 +97,7 @@ func (r *CourseDB) GetCourseModule(courseID uuid.UUID, courseModule *[]entity.Co
 func (r *CourseDB) GetCourseEnrollmentCount(courseID uuid.UUID) (int64, error) {
 	var count int64
 
-	err := r.db.Debug().
+	err := r.db.
 		Model(entity.UserCourse{}).
 		Where("course_id = ?", courseID).
 		Count(&count).
@@ -107,7 +107,7 @@ func (r *CourseDB) GetCourseEnrollmentCount(courseID uuid.UUID) (int64, error) {
 }
 
 func (r *CourseDB) UpdateCourseEnrollment(userCourse *entity.UserCourse) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.UserCourse{}).
 		Create(userCourse).
 		Error
