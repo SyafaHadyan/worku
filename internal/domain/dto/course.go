@@ -50,3 +50,14 @@ type ResponseGetCourseVideo struct {
 	CourseID uuid.UUID `json:"course_id"`
 	VideoURL string    `json:"video_url"`
 }
+
+type ResponseGetCourseModule struct {
+	CourseID         uuid.UUID `json:"course_id"`
+	Name             string    `json:"name"`
+	CourseModuleItem []struct {
+		ID          uuid.UUID `json:"id"`
+		ModuleID    uuid.UUID `json:"module_id"`
+		Name        string    `json:"name"`
+		Description string    `json:"description"`
+	} `json:"course_module_item"`
+}
