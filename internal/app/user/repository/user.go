@@ -13,6 +13,8 @@ type UserDBItf interface {
 	Login(user *entity.User) error
 	GoogleOAuthCreateUser(user *entity.User) error
 	GoogleOAuthCheckUser(user *entity.User) error
+	LinkedInOAuthCreateUser(user *entity.User) error
+	LinkedInOAuthCheckUser(user *entity.User) error
 	UploadProfilePicture(userID uuid.UUID, profilePictureURL string) error
 	UpdateUserInfo(user *entity.User) error
 	UpdateUserDetail(userDetail *entity.UserDetail) error
@@ -81,6 +83,21 @@ func (r *UserDB) GoogleOAuthCreateUser(user *entity.User) error {
 }
 
 func (r *UserDB) GoogleOAuthCheckUser(user *entity.User) error {
+	return r.db.Debug().
+		Model(&entity.User{}).
+		Where("email = ?", user.Email).
+		First(user).
+		Error
+}
+
+func (r *UserDB) LinkedInOAuthCreateUser(user *entity.User) error {
+	return r.db.Debug().
+		Model(&entity.User{}).
+		Create(user).
+		Error
+}
+
+func (r *UserDB) LinkedInOAuthCheckUser(user *entity.User) error {
 	return r.db.Debug().
 		Model(&entity.User{}).
 		Where("email = ?", user.Email).

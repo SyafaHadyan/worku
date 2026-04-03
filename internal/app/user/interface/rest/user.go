@@ -11,6 +11,7 @@ import (
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/infra/env"
 	googleoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/google"
+	linkedinoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/linkedin"
 	"github.com/SyafaHadyan/worku/internal/middleware"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -19,24 +20,27 @@ import (
 )
 
 type UserHandler struct {
-	Validator   *validator.Validate
-	Middleware  middleware.MiddlewareItf
-	UserUseCase usecase.UserUseCaseItf
-	GoogleOAuth googleoauth2.GoogleOAuthItf
-	Config      *env.Env
+	Validator     *validator.Validate
+	Middleware    middleware.MiddlewareItf
+	UserUseCase   usecase.UserUseCaseItf
+	GoogleOAuth   googleoauth2.GoogleOAuthItf
+	LinkedInOAuth linkedinoauth2.LinkedInOAuthItf
+	Config        *env.Env
 }
 
 func NewUserHandler(
 	routerGroup fiber.Router, validator *validator.Validate,
 	middleware middleware.MiddlewareItf, userUseCase usecase.UserUseCaseItf,
-	googleOAuth googleoauth2.GoogleOAuthItf, config *env.Env,
+	googleOAuth googleoauth2.GoogleOAuthItf, linkedinOAuth linkedinoauth2.LinkedInOAuthItf,
+	config *env.Env,
 ) {
 	userHandler := UserHandler{
-		Validator:   validator,
-		Middleware:  middleware,
-		UserUseCase: userUseCase,
-		GoogleOAuth: googleOAuth,
-		Config:      config,
+		Validator:     validator,
+		Middleware:    middleware,
+		UserUseCase:   userUseCase,
+		GoogleOAuth:   googleOAuth,
+		LinkedInOAuth: linkedinOAuth,
+		Config:        config,
 	}
 
 	routerGroup = routerGroup.Group("/users")
@@ -57,6 +61,8 @@ func NewUserHandler(
 	routerGroup.Patch("/info/link", middleware.Authentication, userHandler.UpdateUserLink)
 	routerGroup.Get("/auth/google", userHandler.GoogleLogin)
 	routerGroup.Get("/auth/google/callback", userHandler.GoogleCallback)
+	routerGroup.Get("/auth/linkedin", userHandler.LinkedInLogin)
+	routerGroup.Get("/auth/linkedin/callback", userHandler.LinkedInCallback)
 	routerGroup.Post("/profile/upload", middleware.Authentication, userHandler.UploadProfilePicture)
 	routerGroup.Get("/info", middleware.Authentication, userHandler.GetUserInfo)
 	routerGroup.Get("/info/detail", middleware.Authentication, userHandler.GetUserDetail)
@@ -699,6 +705,50 @@ func (h *UserHandler) GoogleCallback(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "successfully logged in with google",
+		"token":   token,
+		"payload": res,
+	})
+}
+
+func (h *UserHandler) LinkedInLogin(ctx *fiber.Ctx) error {
+	path := h.LinkedInOAuth.LinkedInOAuthConfig()
+	url := path.AuthCodeURL(h.LinkedInOAuth.GenerateRandomState())
+
+	return ctx.Redirect(url)
+}
+
+func (h *UserHandler) LinkedInCallback(ctx *fiber.Ctx) error {
+	var responseLinkedInOAuth dto.ResponseLinkedInOAuth
+
+	oAuthConfig := h.LinkedInOAuth.LinkedInOAuthConfig()
+	oAuthToken, err := oAuthConfig.Exchange(context.Background(), ctx.FormValue("code"))
+	if err != nil {
+		log.Println(err)
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"failed to receive linkedin's response",
+		)
+	}
+
+	responseLinkedInOAuth, err = h.LinkedInOAuth.GetUserInfo(oAuthToken.AccessToken)
+	if err != nil {
+		log.Println(err)
+		return fiber.NewError(
+			http.StatusServiceUnavailable,
+			"failed to get user info",
+		)
+	}
+
+	res, token, err := h.UserUseCase.LinkedInOAuth(responseLinkedInOAuth)
+	if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to log in with linkedin",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "successfully logged in with linkedin",
 		"token":   token,
 		"payload": res,
 	})

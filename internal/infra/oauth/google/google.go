@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/SyafaHadyan/worku/internal/constants"
 	"github.com/SyafaHadyan/worku/internal/domain/dto"
 	"github.com/SyafaHadyan/worku/internal/infra/env"
 	"golang.org/x/oauth2"
@@ -53,7 +54,7 @@ func (g *GoogleOAuth) GoogleOAuthConfig() *oauth2.Config {
 func (g *GoogleOAuth) GetUserInfo(token string) (dto.ResponseGoogleOAuth, error) {
 	var data dto.ResponseGoogleOAuth
 
-	reqURL, err := url.Parse("https://www.googleapis.com/oauth2/v1/userinfo")
+	reqURL, err := url.Parse(string(constants.GoogleOAuthGetUserInfo))
 	if err != nil {
 		return dto.ResponseGoogleOAuth{}, err
 	}

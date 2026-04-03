@@ -29,6 +29,9 @@ cp .env.example .env; vim .env
 |`GOOGLE_CLIENT_ID`|Google Client ID|
 |`GOOGLE_CLIENT_SECRET`|Google Client Secret|
 |`GOOGLE_REDIRECT_URL`|Google Redirect URL|
+|`LINKEDIN_CLIENT_ID`|LinkedIn Client ID|
+|`LINKEDIN_CLIENT_SECRET`|LinkedIn Client Secret|
+|`LINKEDIN_REDIRECT_URL`|LinkedIn Redirect URL|
 |`MIDTRANS_SERVER_KEY`|Midtrans Server Key|
 |`MIDTRANS_CLIENT_KEY`|Midtrans Client Key|
 |`MIDTRANS_CLIENT_ID`|Midtrans Client ID|

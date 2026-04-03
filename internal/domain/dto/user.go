@@ -47,6 +47,15 @@ type ResponseGoogleOAuth struct {
 	Picture       string `json:"picture"`
 }
 
+type ResponseLinkedInOAuth struct {
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Picture       string `json:"picture"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
 type UserDetail struct {
 	// TODO: remove?
 	UserID uuid.UUID `json:"user_id"`
