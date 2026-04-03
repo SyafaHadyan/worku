@@ -14,8 +14,8 @@ import (
 type Job struct {
 	ID                     uuid.UUID `gorm:"type:char(36);primaryKey"`
 	CompanyID              uuid.UUID `gorm:"type:char(36);not null;unique"`
-	Name                   string    `gorm:"type:nvarchar(128)"`
-	Location               string    `gorm:"type:nvarchar(128)"`
+	Name                   string    `gorm:"type:nvarchar(128);index:idx_fulltext_search,class:FULLTEXT"`
+	Location               string    `gorm:"type:nvarchar(128);index:idx_fulltext_search,class:FULLTEXT"`
 	MinimumExperienceYears uint      `gorm:"type:integer unsigned"`
 	Seniority              string    `gorm:"type:nvarchar(64)"`
 	Contract               string    `gorm:"type:nvarchar(64)"`
@@ -92,8 +92,8 @@ func (j *Job) ParseToDTOResponseGetJobList() dto.ResponseGetJobList {
 	return response
 }
 
-func (j *JobTag) ParseToDTOResponseGetJobTag() dto.ResponseGetJobTag {
-	var response dto.ResponseGetJobTag
+func (j *Job) ParseToDTOResponseSearchJob() dto.ResponseSearchJob {
+	var response dto.ResponseSearchJob
 
 	err := copier.Copy(&response, j)
 	if err != nil {

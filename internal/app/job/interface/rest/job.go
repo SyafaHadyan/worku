@@ -32,6 +32,7 @@ func NewJobHandler(
 
 	routerGroup.Get("/job/:jobid", jobHandler.GetJobInfo)
 	routerGroup.Get("/job/:page/:limit", jobHandler.GetJobList)
+	routerGroup.Get("/job/search/:page/:limit/:query", jobHandler.SearchJob)
 	routerGroup.Get("/company/:companyid", jobHandler.GetCompanyInfo)
 }
 
@@ -94,6 +95,44 @@ func (h *JobHandler) GetJobList(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "retrieved job list",
 		"payload": res,
+	})
+}
+
+func (h *JobHandler) SearchJob(ctx *fiber.Ctx) error {
+	offset, err := strconv.Atoi(ctx.Params("page", string(constants.DefaultPage)))
+	if err != nil || offset < 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid page",
+		)
+	}
+
+	limit, err := strconv.Atoi(ctx.Params("limit", string(constants.DefaultLimit)))
+	if err != nil || limit <= 0 {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid limit",
+		)
+	}
+
+	query := ctx.Params("query")
+
+	res, err := h.JobUseCase.SearchJob(offset, limit, query)
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNotFound,
+			"search query doesn't match any job",
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to search job",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"messsage": "retrieved job list",
+		"payload":  res,
 	})
 }
 

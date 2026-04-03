@@ -20,6 +20,7 @@ import (
 type JobUseCaseItf interface {
 	GetJobInfo(jobID uuid.UUID) (dto.ResponseGetJobInfo, error)
 	GetJobList(offset int, limit int) ([]dto.ResponseGetJobList, error)
+	SearchJob(offset int, limit int, query string) ([]dto.ResponseSearchJob, error)
 	GetCompanyInfo(companyID uuid.UUID) (dto.ResponseGetCompanyInfo, error)
 }
 
@@ -99,6 +100,27 @@ func (u *JobUseCase) GetJobList(offset int, limit int) ([]dto.ResponseGetJobList
 
 	for i, jobItem := range job {
 		jobList[i] = jobItem.ParseToDTOResponseGetJobList()
+	}
+
+	return jobList, nil
+}
+
+func (u *JobUseCase) SearchJob(offset int, limit int, query string) ([]dto.ResponseSearchJob, error) {
+	var job []entity.Job
+
+	offset = offset * limit
+
+	err := u.jobRepo.SearchJob(&offset, &limit, &query, &job)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Println(job)
+
+	jobList := make([]dto.ResponseSearchJob, len(job))
+
+	for i, jobItem := range job {
+		jobList[i] = jobItem.ParseToDTOResponseSearchJob()
 	}
 
 	return jobList, nil

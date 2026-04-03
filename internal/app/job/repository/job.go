@@ -10,6 +10,7 @@ import (
 type JobDBItf interface {
 	GetJobInfo(job *entity.Job) error
 	GetJobList(offset *int, limit *int, job *[]entity.Job) error
+	SearchJob(offset *int, limit *int, query *string, job *[]entity.Job) error
 	GetCompanyInfo(company *entity.Company) error
 }
 
@@ -36,6 +37,20 @@ func (r *JobDB) GetJobList(offset *int, limit *int, job *[]entity.Job) error {
 		Limit(*limit).
 		Offset(*offset).
 		Find(job).
+		Error
+}
+
+func (r *JobDB) SearchJob(offset *int, limit *int, query *string, job *[]entity.Job) error {
+	return r.db.Debug().
+		Raw(`
+		SELECT * 
+		FROM jobs
+		WHERE MATCH(name,location)
+		AGAINST (? IN NATURAL LANGUAGE MODE)
+		LIMIT ? OFFSET ? 
+		`,
+			query, limit, offset).
+		Scan(job).
 		Error
 }
 
