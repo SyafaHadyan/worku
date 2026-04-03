@@ -147,24 +147,27 @@ func (u *UserUseCase) Login(login dto.Login) (dto.ResponseLogin, string, error) 
 
 func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error) {
 	user := entity.User{
-		ID:       uuid.New(),
 		Email:    responseGoogleOAuth.Email,
 		Username: responseGoogleOAuth.Email,
 		Name:     responseGoogleOAuth.Email,
 	}
 
-	err := u.userRepo.GoogleOAuth(&user)
-	if err != gorm.ErrRecordNotFound {
-		return dto.ResponseLogin{},
-			"",
-			err
+	userCreate := user
+	userCreate.ID = uuid.New()
+
+	err := u.userRepo.GoogleOAuthCheckUser(&user)
+	if err == gorm.ErrRecordNotFound {
+		err := u.userRepo.GoogleOAuthCreateUser(&userCreate)
+		if err != nil {
+			return dto.ResponseLogin{}, "", err
+		}
+
+		user = userCreate
 	}
 
 	token, err := u.jwt.GenerateToken(user.ID)
 	if err != nil {
-		return dto.ResponseLogin{},
-			"",
-			err
+		return dto.ResponseLogin{}, "", err
 	}
 
 	return user.ParseToDTOResponseLogin(), token, nil
