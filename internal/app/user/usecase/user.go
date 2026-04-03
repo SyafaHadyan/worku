@@ -147,9 +147,10 @@ func (u *UserUseCase) Login(login dto.Login) (dto.ResponseLogin, string, error) 
 
 func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error) {
 	user := entity.User{
-		Email:    responseGoogleOAuth.Email,
-		Username: responseGoogleOAuth.Email,
-		Name:     responseGoogleOAuth.Email,
+		Email:          responseGoogleOAuth.Email,
+		Username:       responseGoogleOAuth.Email,
+		Name:           responseGoogleOAuth.Email,
+		ProfilePicture: responseGoogleOAuth.Picture,
 	}
 
 	userCreate := user
@@ -314,7 +315,7 @@ func (u *UserUseCase) GetUserEducation(userID uuid.UUID) (dto.ResponseGetUserEdu
 func (u *UserUseCase) GetUserLanguage(userID uuid.UUID) ([]dto.ResponseGetUserLanguage, error) {
 	var userLanguage []entity.UserLanguage
 
-	err := u.userRepo.GetUserLanguage(&userLanguage)
+	err := u.userRepo.GetUserLanguage(userID, &userLanguage)
 	if err != nil {
 		return nil, err
 	}
@@ -370,7 +371,7 @@ func (u *UserUseCase) GetUserWorkExperience(userID uuid.UUID) (dto.ResponseGetUs
 func (u *UserUseCase) GetUserHardSkill(userID uuid.UUID) ([]dto.ResponseGetUserHardSkill, error) {
 	var userHardSkill []entity.UserHardSkill
 
-	err := u.userRepo.GetUserHardSkill(&userHardSkill)
+	err := u.userRepo.GetUserHardSkill(userID, &userHardSkill)
 	if err != nil {
 		return nil, err
 	}
@@ -387,7 +388,7 @@ func (u *UserUseCase) GetUserHardSkill(userID uuid.UUID) ([]dto.ResponseGetUserH
 func (u *UserUseCase) GetUserSoftSkill(userID uuid.UUID) ([]dto.ResponseGetUserSoftSkill, error) {
 	var userSoftSkill []entity.UserSoftSkill
 
-	err := u.userRepo.GetUserSoftSkill(&userSoftSkill)
+	err := u.userRepo.GetUserSoftSkill(userID, &userSoftSkill)
 	if err != nil {
 		return nil, err
 	}
@@ -404,7 +405,7 @@ func (u *UserUseCase) GetUserSoftSkill(userID uuid.UUID) ([]dto.ResponseGetUserS
 func (u *UserUseCase) GetUserTools(userID uuid.UUID) ([]dto.ResponseGetUserTools, error) {
 	var userTools []entity.UserTools
 
-	err := u.userRepo.GetUserTools(&userTools)
+	err := u.userRepo.GetUserTools(userID, &userTools)
 	if err != nil {
 		return nil, err
 	}
