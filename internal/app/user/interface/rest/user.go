@@ -1254,15 +1254,15 @@ func (h *UserHandler) DeleteUserTools(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) SoftDelete(ctx *fiber.Ctx) error {
-	targetUserName := ctx.Params("username")
-	userIDTarget, err := h.UserUseCase.GetUserIDFromUsername(targetUserName)
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
 	if err != nil {
 		return fiber.NewError(
-			http.StatusNotFound,
-			"target user not found")
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
 	}
 
-	h.UserUseCase.SoftDelete(userIDTarget)
+	h.UserUseCase.SoftDelete(userID)
 
 	return ctx.Status(http.StatusNoContent).Context().Err()
 }
