@@ -165,9 +165,7 @@ func (u *CourseUseCase) SearchCourse(offset int, limit int, query string) ([]dto
 	offset = offset * limit
 
 	err := u.courseRepo.SearchCourse(&offset, &limit, &query, &course)
-	if len(course) == 0 {
-		return nil, gorm.ErrRecordNotFound
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 

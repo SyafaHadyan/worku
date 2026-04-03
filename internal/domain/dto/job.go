@@ -7,19 +7,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type ResponseSearchJob struct {
-	ID                     uuid.UUID `json:"id"`
-	Name                   string    `json:"name"`
-	Location               string    `json:"location"`
-	MinimumExperienceYears uint      `json:"minimum_experience_years"`
-	Seniority              string    `json:"seniority"`
-	Contract               string    `json:"contact"`
-	SalaryMonthRangeLow    uint32    `json:"salary_month_range_low"`
-	SalaryMonthRangeHigh   uint32    `json:"salary_month_range_high"`
-	CreatedAt              time.Time `json:"created_at"`
-	UpdatedAt              time.Time `json:"updated_at"`
-}
-
 type ResponseGetJobInfo struct {
 	ID                     uuid.UUID `json:"id"`
 	Name                   string    `json:"name"`
@@ -70,8 +57,17 @@ type ResponseGetJobList struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type ResponseGetJobTag struct {
-	Tag string `json:"tag"`
+type ResponseSearchJob struct {
+	ID                     uuid.UUID `json:"id"`
+	Name                   string    `json:"name"`
+	Location               string    `json:"location"`
+	MinimumExperienceYears uint      `json:"minimum_experience_years"`
+	Seniority              string    `json:"seniority"`
+	Contract               string    `json:"contact"`
+	SalaryMonthRangeLow    uint32    `json:"salary_month_range_low"`
+	SalaryMonthRangeHigh   uint32    `json:"salary_month_range_high"`
+	CreatedAt              time.Time `json:"created_at"`
+	UpdatedAt              time.Time `json:"updated_at"`
 }
 
 type ResponseGetCompanyInfo struct {
