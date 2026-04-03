@@ -26,6 +26,8 @@ func Migrate(db *gorm.DB) {
 		entity.CourseCategory{},
 		entity.Course{},
 		entity.CourseVideo{},
+		entity.CourseModule{},
+		entity.CourseModuleItem{},
 		entity.Job{},
 		entity.JobDetail{},
 		entity.JobTag{},

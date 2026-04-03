@@ -22,6 +22,7 @@ type CourseUseCaseItf interface {
 	GetCourseInfo(userID uuid.UUID, courseID uuid.UUID) (dto.ResponseGetCourseInfo, error)
 	SearchCourse(offset int, limit int, query string) ([]dto.ResponseSearchCourse, error)
 	GetCourseVideo(courseID uuid.UUID) ([]dto.ResponseGetCourseVideo, error)
+	GetCourseModule(courseID uuid.UUID) ([]dto.ResponseGetCourseModule, error)
 }
 
 type CourseUseCase struct {
@@ -182,9 +183,7 @@ func (u *CourseUseCase) GetCourseVideo(courseID uuid.UUID) ([]dto.ResponseGetCou
 	var courseVideo []entity.CourseVideo
 
 	err := u.courseRepo.GetCourseVideo(courseID, &courseVideo)
-	if len(courseVideo) == 0 {
-		return nil, gorm.ErrRecordNotFound
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -195,4 +194,21 @@ func (u *CourseUseCase) GetCourseVideo(courseID uuid.UUID) ([]dto.ResponseGetCou
 	}
 
 	return courseVideoList, nil
+}
+
+func (u *CourseUseCase) GetCourseModule(courseID uuid.UUID) ([]dto.ResponseGetCourseModule, error) {
+	var courseModule []entity.CourseModule
+
+	err := u.courseRepo.GetCourseModule(courseID, &courseModule)
+	if err != nil {
+		return nil, err
+	}
+
+	courseModuleList := make([]dto.ResponseGetCourseModule, len(courseModule))
+
+	for i, courseModuleItem := range courseModule {
+		courseModuleList[i] = courseModuleItem.ParseToDTOResponseGetCourseModule()
+	}
+
+	return courseModuleList, nil
 }

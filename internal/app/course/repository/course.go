@@ -15,6 +15,7 @@ type CourseDBItf interface {
 	SearchCourse(offset *int, limit *int, query *string, course *[]entity.Course) error
 	GetCourseInfo(course *entity.Course) error
 	GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.CourseVideo) error
+	GetCourseModule(courseID uuid.UUID, courseModule *[]entity.CourseModule) error
 	GetCourseEnrollmentCount(courseID uuid.UUID) (int64, error)
 	UpdateCourseEnrollment(userCourse *entity.UserCourse) error
 }
@@ -82,6 +83,14 @@ func (r *CourseDB) GetCourseVideo(courseID uuid.UUID, courseVideo *[]entity.Cour
 		Model(&entity.CourseVideo{}).
 		Where("course_id = ?", courseID).
 		Find(courseVideo).
+		Error
+}
+
+func (r *CourseDB) GetCourseModule(courseID uuid.UUID, courseModule *[]entity.CourseModule) error {
+	return r.db.Debug().
+		Preload(clause.Associations).
+		Where("course_id = ?", courseID).
+		Find(courseModule).
 		Error
 }
 

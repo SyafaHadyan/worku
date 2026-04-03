@@ -38,6 +38,7 @@ func NewCourseHandler(
 	routerGroup.Get("/:id", middleware.Authentication, middleware.PaidUser, courseHandler.GetCourseInfo)
 	routerGroup.Get("/search/:page/:limit/:query", middleware.Authentication, courseHandler.SearchCourse)
 	routerGroup.Get("/video/:courseid", middleware.Authentication, middleware.PaidUser, courseHandler.GetCourseVideo)
+	routerGroup.Get("/module/:courseid", middleware.Authentication, middleware.PaidUser, courseHandler.GetCourseModule)
 }
 
 func (h *CourseHandler) GetCourseCategory(ctx *fiber.Ctx) error {
@@ -222,7 +223,7 @@ func (h *CourseHandler) GetCourseVideo(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.CourseUseCase.GetCourseVideo(courseID)
-	if err == gorm.ErrRecordNotFound {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
 		return fiber.NewError(
 			http.StatusNotFound,
 			"invalid course id",
@@ -236,6 +237,34 @@ func (h *CourseHandler) GetCourseVideo(ctx *fiber.Ctx) error {
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
 		"message": "retrieved course video",
+		"payload": res,
+	})
+}
+
+func (h *CourseHandler) GetCourseModule(ctx *fiber.Ctx) error {
+	courseID, err := uuid.Parse(ctx.Params("courseid"))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusBadRequest,
+			"invalid course id",
+		)
+	}
+
+	res, err := h.CourseUseCase.GetCourseModule(courseID)
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNotFound,
+			"invalid course id",
+		)
+	} else if err != nil {
+		return fiber.NewError(
+			http.StatusInternalServerError,
+			"failed to get course module",
+		)
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "retrieved course module",
 		"payload": res,
 	})
 }
