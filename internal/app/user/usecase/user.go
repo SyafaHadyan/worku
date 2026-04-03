@@ -29,7 +29,6 @@ type UserUseCaseItf interface {
 	GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error)
 	LinkedInOAuth(responseLinkedInOAuth dto.ResponseLinkedInOAuth) (dto.ResponseLogin, string, error)
 	UploadProfilePicture(userID uuid.UUID, file multipart.FileHeader) (dto.ResponseGetUserInfo, error)
-	GetUserIDFromUsername(username string) (uuid.UUID, error)
 	GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, error)
 	GetUserDetail(userID uuid.UUID) (dto.ResponseGetUserDetail, error)
 	GetUserContact(userID uuid.UUID) (dto.ResponseGetUserContact, error)
@@ -238,34 +237,6 @@ func (u *UserUseCase) UploadProfilePicture(userID uuid.UUID, file multipart.File
 	u.redis.Delete(redisKey)
 
 	return u.GetUserInfo(userID)
-}
-
-func (u *UserUseCase) GetUserIDFromUsername(username string) (uuid.UUID, error) {
-	// TODO: remove
-	user := entity.User{
-		Username: username,
-	}
-
-	key := fmt.Sprintf("user:%s", username)
-
-	result, err := u.redis.Get(key)
-	if err == nil && result != "" {
-		userID, _ := uuid.Parse(result)
-
-		return userID, nil
-	}
-
-	err = u.userRepo.GetUserIDFromUsername(&user)
-	if err != nil {
-		return uuid.Nil,
-			err
-	}
-
-	go func() {
-		u.redis.Set(key, user.ID.String())
-	}()
-
-	return user.ID, nil
 }
 
 func (u *UserUseCase) GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, error) {

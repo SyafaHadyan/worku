@@ -186,25 +186,14 @@ func (p *Payment) CreateCoreAPIPayment(createMidtransCoreAPIOrder dto.CreateMidt
 }
 
 func (p *Payment) CreateCoreAPISubscription(createMidtransCoreAPISubscription dto.CreateMidtransCoreAPISubscription) (*coreapi.CreateSubscriptionResponse, error) {
-	var amount int64
 	subscriptionName := fmt.Sprintf(
 		"WorkU-%d-%s",
 		createMidtransCoreAPISubscription.Interval,
 		createMidtransCoreAPISubscription.IntervalUnit,
 	)
 
-	if createMidtransCoreAPISubscription.IntervalUnit == "month" {
-		amount = p.calculatePrice(createMidtransCoreAPISubscription.Interval)
-	} else {
-		/*
-		* For testing only
-		* Duration: 1 day
-		* Amount: Rp1
-		 */
-		amount = 1
-	}
+	amount := p.calculatePrice(createMidtransCoreAPISubscription.Interval)
 
-	// TODO: retrieve token from user's saved payment method (credit card only)
 	req := &coreapi.SubscriptionReq{
 		Name:        subscriptionName,
 		Amount:      amount,

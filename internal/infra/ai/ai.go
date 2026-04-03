@@ -47,7 +47,7 @@ func New(env *env.Env) *AI {
 func Test(a *AI) {
 	log.Println("testing openai connection")
 
-	_, err := a.OpenAI.Chat.Completions.New(context.TODO(), openai.ChatCompletionNewParams{
+	_, err := a.OpenAI.Chat.Completions.New(context.Background(), openai.ChatCompletionNewParams{
 		Messages: []openai.ChatCompletionMessageParamUnion{
 			openai.UserMessage(constants.TestOpenAIConnection),
 		},

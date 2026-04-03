@@ -21,7 +21,7 @@ func NewAIDB(db *gorm.DB) AIDBItf {
 }
 
 func (r *AIDB) ResponseAnalyzeCV(responseAnalyzeCV *entity.ResponseAnalyzeCV) error {
-	return r.db.Debug().
+	return r.db.
 		Create(responseAnalyzeCV).
 		Error
 }

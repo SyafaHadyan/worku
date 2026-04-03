@@ -25,14 +25,14 @@ func NewJobDB(db *gorm.DB) JobDBItf {
 }
 
 func (r *JobDB) GetJobInfo(job *entity.Job) error {
-	return r.db.Debug().
+	return r.db.
 		Preload(clause.Associations).
 		First(job).
 		Error
 }
 
 func (r *JobDB) GetJobList(offset *int, limit *int, job *[]entity.Job) error {
-	return r.db.Debug().
+	return r.db.
 		Preload(clause.Associations).
 		Limit(*limit).
 		Offset(*offset).
@@ -41,7 +41,7 @@ func (r *JobDB) GetJobList(offset *int, limit *int, job *[]entity.Job) error {
 }
 
 func (r *JobDB) SearchJob(offset *int, limit *int, query *string, job *[]entity.Job) error {
-	return r.db.Debug().
+	return r.db.
 		Raw(`
 		SELECT * 
 		FROM jobs
@@ -55,7 +55,7 @@ func (r *JobDB) SearchJob(offset *int, limit *int, query *string, job *[]entity.
 }
 
 func (r *JobDB) GetCompanyInfo(company *entity.Company) error {
-	return r.db.Debug().
+	return r.db.
 		Model(&entity.Company{}).
 		First(company).
 		Error
