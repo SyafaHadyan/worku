@@ -743,12 +743,12 @@ func (h *UserHandler) LinkedInCallback(ctx *fiber.Ctx) error {
 	if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
-			"failed to log in with google",
+			"failed to log in with linkedin",
 		)
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{
-		"message": "successfully logged in with google",
+		"message": "successfully logged in with linkedin",
 		"token":   token,
 		"payload": res,
 	})
