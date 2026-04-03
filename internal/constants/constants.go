@@ -1,6 +1,13 @@
 // Package constants store constants
 package constants
 
+type OAuthGetUserInfo string
+
+const (
+	GoogleOAuthGetUserInfo   OAuthGetUserInfo = "https://www.googleapis.com/oauth2/v1/userinfo"
+	LinkedInOAuthGetUserInfo OAuthGetUserInfo = "https://api.linkedin.com/v2/userinfo"
+)
+
 type Pagination string
 
 const (
