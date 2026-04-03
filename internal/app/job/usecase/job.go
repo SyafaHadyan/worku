@@ -70,15 +70,17 @@ func (u *JobUseCase) GetJobInfo(jobID uuid.UUID) (dto.ResponseGetJobInfo, error)
 		return dto.ResponseGetJobInfo{}, err
 	}
 
+	jobParsed := job.ParseToDTOResponseGetJobInfo()
+
 	go func() {
-		newData, err := json.Marshal(job)
+		newData, err := json.Marshal(jobParsed)
 		if err != nil {
 			log.Println(err)
 		}
 		u.redis.Set(redisKey, string(newData))
 	}()
 
-	return job.ParseToDTOResponseGetJobInfo(), nil
+	return jobParsed, nil
 }
 
 func (u *JobUseCase) GetJobList(offset int, limit int) ([]dto.ResponseGetJobList, error) {
