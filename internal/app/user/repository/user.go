@@ -11,7 +11,8 @@ import (
 type UserDBItf interface {
 	Register(user *entity.User) error
 	Login(user *entity.User) error
-	GoogleOAuth(user *entity.User) error
+	GoogleOAuthCreateUser(user *entity.User) error
+	GoogleOAuthCheckUser(user *entity.User) error
 	UploadProfilePicture(userID uuid.UUID, profilePictureURL string) error
 	UpdateUserInfo(user *entity.User) error
 	UpdateUserDetail(userDetail *entity.UserDetail) error
@@ -29,13 +30,13 @@ type UserDBItf interface {
 	GetUserDetail(userDetail *entity.UserDetail) error
 	GetUserContact(userContact *entity.UserContact) error
 	GetUserEducation(userEducation *entity.UserEducation) error
-	GetUserLanguage(userLanguage *[]entity.UserLanguage) error
+	GetUserLanguage(userID uuid.UUID, userLanguage *[]entity.UserLanguage) error
 	GetUserEmployment(userEmployment *entity.UserEmployment) error
 	GetUserSeniority(userSeniority *entity.UserSeniority) error
 	GetUserWorkExperience(userWorkExperience *entity.UserWorkExperience) error
-	GetUserHardSkill(userHardSkill *[]entity.UserHardSkill) error
-	GetUserSoftSkill(userSoftSkill *[]entity.UserSoftSkill) error
-	GetUserTools(userTools *[]entity.UserTools) error
+	GetUserHardSkill(userID uuid.UUID, userHardSkill *[]entity.UserHardSkill) error
+	GetUserSoftSkill(userID uuid.UUID, userSoftSkill *[]entity.UserSoftSkill) error
+	GetUserTools(userID uuid.UUID, userTools *[]entity.UserTools) error
 	GetUserLink(userLink *entity.UserLink) error
 	GetUserSubscription(userSubscription *entity.UserSubscription) error
 	CheckUsername(user *entity.User) error
@@ -72,16 +73,17 @@ func (r *UserDB) Login(user *entity.User) error {
 		Error
 }
 
-func (r *UserDB) GoogleOAuth(user *entity.User) error {
-	// TODO: Fix
-
-	r.db.Debug().
-		Model(&entity.User{}).
-		Create(user)
-
+func (r *UserDB) GoogleOAuthCreateUser(user *entity.User) error {
 	return r.db.Debug().
-		Model(user).
-		Where("users.email = ?", user.Email).
+		Model(&entity.User{}).
+		Create(user).
+		Error
+}
+
+func (r *UserDB) GoogleOAuthCheckUser(user *entity.User) error {
+	return r.db.Debug().
+		Model(&entity.User{}).
+		Where("email = ?", user.Email).
 		First(user).
 		Error
 }
@@ -277,9 +279,10 @@ func (r *UserDB) GetUserEducation(userEducation *entity.UserEducation) error {
 		Error
 }
 
-func (r *UserDB) GetUserLanguage(userLanguage *[]entity.UserLanguage) error {
+func (r *UserDB) GetUserLanguage(userID uuid.UUID, userLanguage *[]entity.UserLanguage) error {
 	return r.db.Debug().
 		Model(&entity.UserLanguage{}).
+		Where("user_id = ?", userID).
 		Find(userLanguage).
 		Error
 }
@@ -305,23 +308,26 @@ func (r *UserDB) GetUserWorkExperience(userWorkExperience *entity.UserWorkExperi
 		Error
 }
 
-func (r *UserDB) GetUserHardSkill(userHardSkill *[]entity.UserHardSkill) error {
+func (r *UserDB) GetUserHardSkill(userID uuid.UUID, userHardSkill *[]entity.UserHardSkill) error {
 	return r.db.Debug().
 		Model(&entity.UserHardSkill{}).
+		Where("user_id = ?", userID).
 		Find(userHardSkill).
 		Error
 }
 
-func (r *UserDB) GetUserSoftSkill(userSoftSkill *[]entity.UserSoftSkill) error {
+func (r *UserDB) GetUserSoftSkill(userID uuid.UUID, userSoftSkill *[]entity.UserSoftSkill) error {
 	return r.db.Debug().
 		Model(&entity.UserSoftSkill{}).
+		Where("user_id = ?", userID).
 		Find(userSoftSkill).
 		Error
 }
 
-func (r *UserDB) GetUserTools(userTools *[]entity.UserTools) error {
+func (r *UserDB) GetUserTools(userID uuid.UUID, userTools *[]entity.UserTools) error {
 	return r.db.Debug().
 		Model(&entity.UserTools{}).
+		Where("user_id = ?", userID).
 		Find(userTools).
 		Error
 }

@@ -769,7 +769,10 @@ func (h *UserHandler) GetUserDetail(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserDetail(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user detail",
@@ -792,7 +795,10 @@ func (h *UserHandler) GetUserContact(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserContact(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user contact",
@@ -815,7 +821,10 @@ func (h *UserHandler) GetUserEducation(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserEducation(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user education",
@@ -838,7 +847,10 @@ func (h *UserHandler) GetUserLanguage(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserLanguage(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user language",
@@ -861,7 +873,10 @@ func (h *UserHandler) GetUserEmployment(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserEmployment(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user employment",
@@ -884,7 +899,10 @@ func (h *UserHandler) GetUserSeniority(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserSeniority(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user seniority",
@@ -907,7 +925,10 @@ func (h *UserHandler) GetUserWorkExperience(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserWorkExperience(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user work experience",
@@ -930,7 +951,10 @@ func (h *UserHandler) GetUserHardSkill(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserHardSkill(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user hard skill",
@@ -953,7 +977,10 @@ func (h *UserHandler) GetUserSoftSkill(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserSoftSkill(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user soft skill",
@@ -976,7 +1003,10 @@ func (h *UserHandler) GetUserTools(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserTools(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user tools",
@@ -999,7 +1029,10 @@ func (h *UserHandler) GetUserLink(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserLink(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user link",
@@ -1022,7 +1055,10 @@ func (h *UserHandler) GetUserSubscription(ctx *fiber.Ctx) error {
 	}
 
 	res, err := h.UserUseCase.GetUserSubscription(userID)
-	if err != nil {
+	if err == gorm.ErrRecordNotFound {
+		return fiber.NewError(
+			http.StatusNoContent)
+	} else if err != nil {
 		return fiber.NewError(
 			http.StatusInternalServerError,
 			"failed to get user subscription",
