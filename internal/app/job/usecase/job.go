@@ -55,14 +55,14 @@ func (u *JobUseCase) GetJobInfo(jobID uuid.UUID) (dto.ResponseGetJobInfo, error)
 
 	result, err := u.redis.Get(redisKey)
 	if err == nil && result != "" {
-		var out entity.Job
+		var out dto.ResponseGetJobInfo
 
 		err := json.Unmarshal([]byte(result), &out)
 		if err != nil {
 			log.Println(err)
 		}
 
-		return out.ParseToDTOResponseGetJobInfo(), nil
+		return out, nil
 	}
 
 	err = u.jobRepo.GetJobInfo(&job)
