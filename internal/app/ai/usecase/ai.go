@@ -21,7 +21,7 @@ import (
 type AIUseCaseItf interface {
 	NewAIInterview(newAIInterview dto.NewAIInterview) (dto.ResponseAIInterview, error)
 	ContinueAIInterview(continueAIInterview dto.ContinueAIInterview) (dto.ResponseAIInterview, error)
-	Transcribe(file *multipart.FileHeader) (dto.ResponseTranscribe, error)
+	Transcribe(userID uuid.UUID, file *multipart.FileHeader) (dto.ResponseTranscribe, error)
 	UploadCV(userID uuid.UUID, file multipart.FileHeader) (dto.ResponseUploadCV, error)
 	AnalyzeCV(analyzeCV dto.AnalyzeCV) (dto.ResponseAnalyzeCV, error)
 }
@@ -67,8 +67,32 @@ func (u *AIUseCase) ContinueAIInterview(continueAIInterview dto.ContinueAIInterv
 	}, err
 }
 
-func (u *AIUseCase) Transcribe(file *multipart.FileHeader) (dto.ResponseTranscribe, error) {
+func (u *AIUseCase) Transcribe(userID uuid.UUID, file *multipart.FileHeader) (dto.ResponseTranscribe, error) {
 	response, err := u.ai.Transcribe(u.aiContext, file)
+
+	go func() {
+		fileContent, err := file.Open()
+		if err != nil {
+			return
+		}
+
+		byteContainer, err := io.ReadAll(fileContent)
+		if err != nil {
+			return
+		}
+
+		objectKey := fmt.Sprintf(
+			"%s/%s/%s",
+			constants.UserVoiceDirectory,
+			userID.String(),
+			uuid.New().String(),
+		)
+
+		err = u.s3.Upload(u.s3Context, objectKey, byteContainer)
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 
 	return dto.ResponseTranscribe{
 		Response: response,
