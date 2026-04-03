@@ -25,7 +25,9 @@ const (
 type S3 string
 
 const (
-	ProfileDirectory S3 = "profile"
+	ProfileDirectory   S3 = "profile"
+	CVDirectory        S3 = "cv"
+	UserVoiceDirectory S3 = "user-voice"
 )
 
 type AIInstruction string

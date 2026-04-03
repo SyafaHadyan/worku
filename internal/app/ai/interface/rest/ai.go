@@ -108,6 +108,14 @@ func (h *AIHandler) ContinueAIInterview(ctx *fiber.Ctx) error {
 }
 
 func (h *AIHandler) Transcribe(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
 	file, err := ctx.FormFile("voice")
 	if err != nil {
 		return fiber.NewError(
@@ -116,7 +124,7 @@ func (h *AIHandler) Transcribe(ctx *fiber.Ctx) error {
 		)
 	}
 
-	res, err := h.AIUseCase.Transcribe(file)
+	res, err := h.AIUseCase.Transcribe(userID, file)
 	if err == fiber.ErrBadRequest {
 		return fiber.NewError(
 			http.StatusBadRequest,
@@ -136,6 +144,14 @@ func (h *AIHandler) Transcribe(ctx *fiber.Ctx) error {
 }
 
 func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {
+	userID, err := uuid.Parse(ctx.Locals("userID").(string))
+	if err != nil {
+		return fiber.NewError(
+			http.StatusUnauthorized,
+			"user unauthorized",
+		)
+	}
+
 	file, err := ctx.FormFile("document")
 	if err != nil {
 		return fiber.NewError(
@@ -144,7 +160,7 @@ func (h *AIHandler) UploadCV(ctx *fiber.Ctx) error {
 		)
 	}
 
-	res, err := h.AIUseCase.UploadCV(*file)
+	res, err := h.AIUseCase.UploadCV(userID, *file)
 	if err == fiber.ErrBadRequest {
 		return fiber.NewError(
 			http.StatusBadRequest,
