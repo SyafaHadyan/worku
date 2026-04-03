@@ -26,6 +26,7 @@ import (
 	fiberapp "github.com/SyafaHadyan/worku/internal/infra/fiber"
 	"github.com/SyafaHadyan/worku/internal/infra/jwt"
 	googleoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/google"
+	linkedinoauth2 "github.com/SyafaHadyan/worku/internal/infra/oauth/linkedin"
 	"github.com/SyafaHadyan/worku/internal/infra/payment"
 	"github.com/SyafaHadyan/worku/internal/infra/redis"
 	"github.com/SyafaHadyan/worku/internal/infra/s3"
@@ -66,6 +67,8 @@ func Start() *Bootstrap {
 
 	googleoauth2 := googleoauth2.New(config)
 
+	linkedinoauth2 := linkedinoauth2.New(config)
+
 	payment := payment.New(config)
 
 	app := fiberapp.New(config)
@@ -84,7 +87,7 @@ func Start() *Bootstrap {
 
 	middleware := middleware.NewMiddleware(*jwt, userUseCase)
 
-	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, config)
+	userhandler.NewUserHandler(app.Router, validator, middleware, userUseCase, googleoauth2, linkedinoauth2, config)
 	coursehandler.NewCourseHandler(app.Router, validator, middleware, courseUseCase)
 	jobhandler.NewJobHandler(app.Router, validator, middleware, jobUseCase)
 	aihandler.NewAIHandler(app.Router, validator, decoder, middleware, aiUseCase)

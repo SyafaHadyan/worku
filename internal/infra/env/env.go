@@ -33,6 +33,9 @@ type Env struct {
 	GoogleClientID                    string `env:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret                string `env:"GOOGLE_CLIENT_SECRET"`
 	GoogleRedirectURL                 string `env:"GOOGLE_REDIRECT_URL"`
+	LinkedInClientID                  string `env:"LINKEDIN_CLIENT_ID"`
+	LinkedInClientSecret              string `env:"LINKEDIN_CLIENT_SECRET"`
+	LinkedInRedirectURL               string `env:"LINKEDIN_REDIRECT_URL"`
 	MidtransServerKey                 string `env:"MIDTRANS_SERVER_KEY"`
 	MidtransClientKey                 string `env:"MIDTRANS_CLIENT_KEY"`
 	MidtransClientID                  string `env:"MIDTRANS_CLIENT_ID"`

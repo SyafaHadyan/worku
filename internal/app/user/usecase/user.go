@@ -27,6 +27,7 @@ type UserUseCaseItf interface {
 	Register(register dto.Register) (dto.ResponseRegister, error)
 	Login(login dto.Login) (dto.ResponseLogin, string, error)
 	GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (dto.ResponseLogin, string, error)
+	LinkedInOAuth(responseLinkedInOAuth dto.ResponseLinkedInOAuth) (dto.ResponseLogin, string, error)
 	UploadProfilePicture(userID uuid.UUID, file multipart.FileHeader) (dto.ResponseGetUserInfo, error)
 	GetUserIDFromUsername(username string) (uuid.UUID, error)
 	GetUserInfo(userID uuid.UUID) (dto.ResponseGetUserInfo, error)
@@ -159,6 +160,35 @@ func (u *UserUseCase) GoogleOAuth(responseGoogleOAuth dto.ResponseGoogleOAuth) (
 	err := u.userRepo.GoogleOAuthCheckUser(&user)
 	if err == gorm.ErrRecordNotFound {
 		err := u.userRepo.GoogleOAuthCreateUser(&userCreate)
+		if err != nil {
+			return dto.ResponseLogin{}, "", err
+		}
+
+		user = userCreate
+	}
+
+	token, err := u.jwt.GenerateToken(user.ID)
+	if err != nil {
+		return dto.ResponseLogin{}, "", err
+	}
+
+	return user.ParseToDTOResponseLogin(), token, nil
+}
+
+func (u *UserUseCase) LinkedInOAuth(responseLinkedInOAuth dto.ResponseLinkedInOAuth) (dto.ResponseLogin, string, error) {
+	user := entity.User{
+		Email:          responseLinkedInOAuth.Email,
+		Username:       responseLinkedInOAuth.Email,
+		Name:           responseLinkedInOAuth.GivenName,
+		ProfilePicture: responseLinkedInOAuth.Picture,
+	}
+
+	userCreate := user
+	userCreate.ID = uuid.New()
+
+	err := u.userRepo.LinkedInOAuthCheckUser(&user)
+	if err == gorm.ErrRecordNotFound {
+		err := u.userRepo.LinkedInOAuthCreateUser(&userCreate)
 		if err != nil {
 			return dto.ResponseLogin{}, "", err
 		}
