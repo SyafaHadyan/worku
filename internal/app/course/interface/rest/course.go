@@ -190,10 +190,11 @@ func (h *CourseHandler) SearchCourse(ctx *fiber.Ctx) error {
 			"invalid limit",
 		)
 	}
+
 	query := ctx.Params("query")
 
 	res, err := h.CourseUseCase.SearchCourse(offset, limit, query)
-	if err == gorm.ErrRecordNotFound {
+	if err == gorm.ErrRecordNotFound || len(res) == 0 {
 		return fiber.NewError(
 			http.StatusNotFound,
 			"search query doesn't match any course",
